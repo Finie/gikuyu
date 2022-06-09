@@ -5,69 +5,68 @@ import {
   CollapseHeader,
   CollapseBody,
 } from 'accordion-collapse-react-native';
+import LottieView from 'lottie-react-native';
+
 import Text from '../Text';
 import useThemeStyles from 'src/hooks/useThemeStyles';
 import Unchecked from 'src/assets/icons/checkboxunchek.svg';
 import Checked from 'src/assets/icons/checkboxcheck.svg';
 import FloatingLabelInput from '../FloatingLabelInput';
+import authRouter from 'src/api/routers/authRouter';
 
-const Accordion = () => {
+const Accordion = ({data}) => {
   const {colors} = useThemeStyles();
   const [isExpanded, setisExpanded] = useState(false);
   const [ismiddleExpanded, setismiddleExpanded] = useState(false);
   const [isOthersExpanded, setisOthersExpanded] = useState(false);
   const [selectedId, setselectedId] = useState(100);
+  const [isLoading, setIsloading] = useState(false);
+  const [tribeData, setTribeData] = useState([]);
 
-  const tribeData = [
-    {
-      id: 0,
-      name: 'Kikuyu',
-    },
-    {
-      id: 1,
-      name: 'Luhya',
-    },
-    {
-      id: 2,
-      name: 'Kalenjin',
-    },
-    {
-      id: 3,
-      name: 'Luo',
-    },
-    {
-      id: 4,
-      name: 'Kamba',
-    },
-    {
-      id: 5,
-      name: 'Somali',
-    },
-    {
-      id: 6,
-      name: 'Kisii',
-    },
-    {
-      id: 7,
-      name: 'Meru',
-    },
-    {
-      id: 8,
-      name: 'Maasai',
-    },
-    {
-      id: 9,
-      name: 'Turkana',
-    },
-    {
-      id: 10,
-      name: 'Mijikenda',
-    },
-    {
-      id: 11,
-      name: 'Other',
-    },
-  ];
+  const toogleExpand = () => {
+    setisExpanded(!isExpanded);
+    setisOthersExpanded(false);
+    setismiddleExpanded(false);
+  };
+
+  const toogleOtherExpand = () => {
+    setisOthersExpanded(!isOthersExpanded);
+    setisExpanded(false);
+    setismiddleExpanded(false);
+  };
+
+  const tooglemiddleExpand = () => {
+    setisOthersExpanded(false);
+    setisExpanded(false);
+    setismiddleExpanded(!ismiddleExpanded);
+  };
+
+  const choosePosition = (clicked: {id: number; name: string}) => {
+    if (clicked.name === 'Kenyan') {
+      toogleExpand();
+      fetchEthnicGroups(clicked.id);
+    } else if (clicked.name === 'Black / African descent') {
+      tooglemiddleExpand();
+    } else if (clicked.name === 'Other') {
+      toogleOtherExpand();
+    }
+  };
+
+  const fetchEthnicGroups = async (id: number) => {
+    setTribeData([]);
+    setIsloading(true);
+    const response = await authRouter.getListOfethnicGroups(id);
+    setIsloading(false);
+
+    if (response.ok) {
+      setTribeData(response.data.data);
+      return;
+    }
+
+    console.log('====================================');
+    console.log(response);
+    console.log('====================================');
+  };
 
   const styles = StyleSheet.create({
     container: {
@@ -114,25 +113,6 @@ const Accordion = () => {
       borderColor: colors.snow,
     },
   });
-
-  const toogleExpand = () => {
-    setisExpanded(!isExpanded);
-    setisOthersExpanded(false);
-    setismiddleExpanded(false);
-  };
-
-  const toogleOtherExpand = () => {
-    setisOthersExpanded(!isOthersExpanded);
-    setisExpanded(false);
-    setismiddleExpanded(false);
-  };
-
-  const tooglemiddleExpand = () => {
-    setisOthersExpanded(false);
-    setisExpanded(false);
-    setismiddleExpanded(!ismiddleExpanded);
-  };
-
   const Accordions = ({header, onPress, isExpanded}) => {
     return (
       <Collapse isExpanded={isExpanded}>
@@ -169,8 +149,22 @@ const Accordion = () => {
             </View>
           ) : (
             <>
+              {isLoading && (
+                <View
+                  style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <LottieView
+                    autoPlay={true}
+                    loop={true}
+                    source={require('src/assets/lottie/ethnicityload.json')}
+                    style={{height: 10}}
+                  />
+                  <Text style={{marginTop: 16}}>fetching groups ...</Text>
+                </View>
+              )}
               {tribeData.map((item, index) => {
-                console.log(item.name);
                 return (
                   <>
                     {item.name !== 'Other' ? (
@@ -211,21 +205,25 @@ const Accordion = () => {
 
   return (
     <>
-      <Accordions
-        onPress={toogleExpand}
-        isExpanded={isExpanded}
-        header={'Kenyan'}
-      />
-      <Accordions
-        onPress={tooglemiddleExpand}
-        isExpanded={ismiddleExpanded}
-        header={'Black / African descent'}
-      />
-      <Accordions
-        onPress={toogleOtherExpand}
-        isExpanded={isOthersExpanded}
-        header={'Other'}
-      />
+      {data.map((item, index) => {
+        return (
+          <Accordions
+            onPress={() => {
+              choosePosition(item);
+            }}
+            isExpanded={
+              item.name === 'Kenyan'
+                ? isExpanded
+                : item.name === 'Black / African descent'
+                ? ismiddleExpanded
+                : item.name === 'Other'
+                ? isOthersExpanded
+                : null
+            }
+            header={item.name}
+          />
+        );
+      })}
     </>
   );
 };

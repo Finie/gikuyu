@@ -1,5 +1,5 @@
 import {View, StyleSheet, TouchableOpacity} from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import * as Yup from 'yup';
 
 import AuthScreen from 'src/components/screen/AuthScreen';
@@ -7,10 +7,25 @@ import Text from 'src/components/Text';
 import AppForm from 'src/components/forms/AppForm';
 import useThemeStyles from 'src/hooks/useThemeStyles';
 
+import Musicnote from 'src/assets/icons/musicnote.svg'; //
+import InactiveNote from 'src/assets/icons/inactivenote.svg'; //mapinactive.svg
+import Fashion from 'src/assets/icons/fashionprimary.svg';
+import InactiveFashion from 'src/assets/icons/inactivefashion.svg';
+import PaintPrimary from 'src/assets/icons/fooddrinkprimary.svg';
+import PaintInactivr from 'src/assets/icons/paininactive.svg';
+import Foodiconprimaty from 'src/assets/icons/paintprimary.svg';
+import BirthDayCake from 'src/assets/icons/birthdaycake.svg';
+import BirthDayCakeInactive from 'src/assets/icons/cakeinactive.svg';
+import MapInactive from 'src/assets/icons/mapinactive.svg';
+import Unchecked from 'src/assets/icons/checkboxunchek.svg';
+import Checked from 'src/assets/icons/checkboxcheck.svg';
+
 import Info from 'src/assets/icons/infoicon.svg';
 import Add from 'src/assets/icons/add.svg';
 import FloatingLabelInput from 'src/components/FloatingLabelInput';
 import Button from 'src/components/pressable/Button';
+import PassionItem from 'src/components/PassionItem';
+import Helpers from 'src/Helpers';
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().required().email().label('Email'),
@@ -24,10 +39,61 @@ export default function InterestsScreen() {
   const [isfood, setisfood] = useState(false);
   const [ispainting, setispainting] = useState(false);
   const [istravel, setistravel] = useState(false);
+  const [moreSelected, setmoreSelected] = useState([] as any);
+
+  const data = [
+    {
+      id: 1,
+      name: 'I smoke',
+    },
+    {
+      id: 2,
+      name: 'I smoke',
+    },
+    {
+      id: 3,
+      name: 'I smoke',
+    },
+  ];
 
   const handleSumbit = () => {};
 
   const handleSwitch = () => setisChecked(!ischecked);
+
+  const isFirstElement = (index: number) => {
+    if (index === 0) {
+      return true;
+    }
+
+    return false;
+  };
+
+  const isLastElement = (index: number, length: number) => {
+    if (index === length) {
+      return true;
+    }
+
+    return false;
+  };
+
+  const onMoreItemsSelection = (data: {id: number; name: string}) => {
+    if (Helpers.isEmpty(moreSelected)) {
+      moreSelected.push(data);
+      return;
+    }
+
+    const array = moreSelected.filter((element: {id: number; name: string}) => {
+      return element.id !== data.id;
+    });
+
+    setmoreSelected(array);
+  };
+
+  useEffect(() => {
+    console.log('====================================');
+    console.log(JSON.stringify(moreSelected));
+    console.log('====================================');
+  }, [moreSelected.lenght]);
 
   const styles = StyleSheet.create({
     container: {
@@ -121,7 +187,46 @@ export default function InterestsScreen() {
     selectiontexttypeinactive: {marginHorizontal: 16},
     selectiontexttypeactive: {marginHorizontal: 16, color: colors.white},
     buttoncontainer: {marginHorizontal: 30, marginBottom: 200, marginTop: 30},
+    passionholder: {},
+    passioniteholder: {
+      marginVertical: 5,
+      flexDirection: 'row',
+    },
+    passionname: {
+      fontSize: 16,
+      lineHeight: 20,
+      fontWeight: '600',
+      color: colors.black,
+      marginVertical: 20,
+    },
+    morecontainer: {
+      borderWidth: 1,
+      padding: 16,
+      borderColor: colors.snow,
+    },
+
+    morecontainerisFirst: {
+      borderWidth: 1,
+      padding: 16,
+      borderColor: colors.snow,
+      borderTopLeftRadius: 10,
+      borderTopRightRadius: 10,
+    },
+    morecontainerisLast: {
+      borderWidth: 1,
+      padding: 16,
+      borderColor: colors.snow,
+      borderBottomLeftRadius: 10,
+      borderBottomRightRadius: 10,
+    },
+    morename: {
+      marginLeft: 16,
+      fontSize: 14,
+      lineHeight: 17,
+      color: colors.black,
+    },
   });
+
   return (
     <AuthScreen>
       <AppForm
@@ -167,93 +272,75 @@ export default function InterestsScreen() {
             </View>
           </View>
 
-          <View style={styles.pash2}>
-            <TouchableOpacity
-              onPress={() => setisart(!isart)}
-              style={isart ? styles.selectionactive : styles.selectioninactive}>
-              <Info />
-              <Text
-                style={
-                  isart
-                    ? styles.selectiontexttypeactive
-                    : styles.selectiontexttypeinactive
-                }>
-                Arts & Music
-              </Text>
-              <Add />
-            </TouchableOpacity>
+          <View style={styles.passionholder}>
+            <Text style={styles.passionname}>Passions</Text>
 
-            <TouchableOpacity
-              onPress={() => setisfashion(!isfashion)}
-              style={
-                isfashion ? styles.selectionactive : styles.selectioninactive
-              }>
-              <Info />
-              <Text
-                style={
-                  isfashion
-                    ? styles.selectiontexttypeactive
-                    : styles.selectiontexttypeinactive
-                }>
-                Fashion
-              </Text>
-              <Add />
-            </TouchableOpacity>
+            <View style={styles.passioniteholder}>
+              <PassionItem
+                Icon={<Musicnote />}
+                label={'Arts & Music'}
+                Inactive={<InactiveNote />}
+              />
+              <PassionItem
+                Icon={<Fashion />}
+                label={'Fashion'}
+                Inactive={<InactiveFashion />}
+              />
+            </View>
+
+            <View style={styles.passioniteholder}>
+              <PassionItem
+                Icon={<BirthDayCake />}
+                label={'Food & Drink'}
+                Inactive={<BirthDayCakeInactive />}
+              />
+              <PassionItem
+                Icon={<PaintPrimary />}
+                label={'Painting'}
+                Inactive={<PaintInactivr />}
+              />
+            </View>
+
+            <View style={styles.passioniteholder}>
+              <PassionItem
+                Icon={<Foodiconprimaty />}
+                label={'Travel & Places'}
+                Inactive={<MapInactive />}
+              />
+            </View>
           </View>
 
-          <View style={styles.pash2}>
-            <TouchableOpacity
-              onPress={() => setisfood(!isfood)}
-              style={
-                isfood ? styles.selectionactive : styles.selectioninactive
-              }>
-              <Info />
-              <Text
-                style={
-                  isfood
-                    ? styles.selectiontexttypeactive
-                    : styles.selectiontexttypeinactive
-                }>
-                Food & Drink
-              </Text>
-              <Add />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => setispainting(!ispainting)}
-              style={
-                ispainting ? styles.selectionactive : styles.selectioninactive
-              }>
-              <Info />
-              <Text
-                style={
-                  ispainting
-                    ? styles.selectiontexttypeactive
-                    : styles.selectiontexttypeinactive
-                }>
-                Painting
-              </Text>
-              <Add />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.pash2}>
-            <TouchableOpacity
-              onPress={() => setistravel(!istravel)}
-              style={
-                istravel ? styles.selectionactive : styles.selectioninactive
-              }>
-              <Info />
-              <Text
-                style={
-                  istravel
-                    ? styles.selectiontexttypeactive
-                    : styles.selectiontexttypeinactive
-                }>
-                Travel & Places
-              </Text>
-              <Add />
-            </TouchableOpacity>
+          <View>
+            <Text style={styles.passionname}>More</Text>
+            <>
+              {data.map((item, index) => {
+                console.log('====================================');
+                console.log(data.length);
+                console.log(index);
+                console.log('====================================');
+                return (
+                  <TouchableOpacity
+                    onPress={() => onMoreItemsSelection(item)}
+                    key={index}
+                    style={
+                      isLastElement(index, data.length - 1)
+                        ? styles.morecontainerisLast
+                        : isFirstElement(index)
+                        ? styles.morecontainerisFirst
+                        : styles.morecontainer
+                    }>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                      }}>
+                      <Checked />
+                      <Text style={styles.morename}>{item.name}</Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </>
           </View>
         </View>
 

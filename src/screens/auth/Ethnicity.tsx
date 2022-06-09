@@ -1,6 +1,7 @@
 import {View, StyleSheet} from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import * as Yup from 'yup';
+import LottieView from 'lottie-react-native';
 
 import AuthScreen from 'src/components/screen/AuthScreen';
 import Text from 'src/components/Text';
@@ -10,6 +11,7 @@ import useThemeStyles from 'src/hooks/useThemeStyles';
 import {Picker} from '@davidgovea/react-native-wheel-datepicker';
 import Accordion from 'src/components/view/Accordion';
 import FloatingButton from 'src/components/FloatingButton';
+import authRouter from 'src/api/routers/authRouter';
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().required().email().label('Email'),
@@ -19,10 +21,31 @@ export default function Ethnicity({navigation}) {
   const {colors} = useThemeStyles();
   const [ischecked, setisChecked] = useState(false);
   const [selectedIndex, setselectedIndex] = useState(3);
+  const [isLoading, setIsLoading] = useState(false);
+  const [data, setData] = useState([]);
 
   const handleSumbit = () => {};
 
   const handleSwitch = () => setisChecked(!ischecked);
+
+  const fetchEthnicGroups = async () => {
+    setIsLoading(true);
+    const response = await authRouter.getEthnicGroups();
+    setIsLoading(false);
+
+    if (response.ok) {
+      setData(response.data.data);
+      return;
+    }
+
+    console.log('====================================');
+    console.log(response);
+    console.log('====================================');
+  };
+
+  useEffect(() => {
+    fetchEthnicGroups();
+  }, []);
 
   const styles = StyleSheet.create({
     container: {
@@ -75,7 +98,16 @@ export default function Ethnicity({navigation}) {
       lineHeight: 15,
     },
     accordion: {flex: 1, marginTop: 40},
+    lottieholder: {
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    lottie: {
+      height: 200,
+      width: '100%',
+    },
   });
+
   return (
     <AuthScreen
       onBackPressed={function (): void {
@@ -89,9 +121,23 @@ export default function Ethnicity({navigation}) {
         onSubmit={handleSumbit}>
         <View style={styles.container}>
           <Text style={styles.howtwxt}>What’s your ethnicity?</Text>
-          <View style={styles.accordion}>
-            <Accordion />
-          </View>
+
+          {isLoading ? (
+            <View style={styles.lottieholder}>
+              <LottieView
+                autoPlay={true}
+                loop={true}
+                source={require('src/assets/lottie/heart.json')}
+                style={styles.lottie}
+              />
+
+              <Text>Loading ...</Text>
+            </View>
+          ) : (
+            <View style={styles.accordion}>
+              <Accordion data={data} />
+            </View>
+          )}
         </View>
         <View style={styles.bottomcontainer}>
           <View style={styles.fabcontainer}>

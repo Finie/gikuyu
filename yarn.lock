@@ -2123,6 +2123,13 @@ anymatch@^3.0.3:
     normalize-path "^3.0.0"
     picomatch "^2.0.4"
 
+apisauce@^2.1.5:
+  version "2.1.5"
+  resolved "https://registry.npmjs.org/apisauce/-/apisauce-2.1.5.tgz#546229f8f145711b3b022065afb0f43bd304ecb3"
+  integrity sha512-bkMlz0ZUnyS8vDigej9UBYo5dne9/bQrkgIiIkGaiDHF6e5OxhYRLJDYu65V/Ox86tmWVwepIntAoTmk4Db0Hg==
+  dependencies:
+    axios "^0.21.4"
+
 appdirsjs@^1.2.4:
   version "1.2.6"
   resolved "https://registry.npmjs.org/appdirsjs/-/appdirsjs-1.2.6.tgz#fccf9ee543315492867cacfcfd4a2b32257d30ac"
@@ -2244,6 +2251,13 @@ atob@^2.1.2:
   version "2.1.2"
   resolved "https://registry.npmjs.org/atob/-/atob-2.1.2.tgz#6d9517eb9e030d2436666651e86bd9f6f13533c9"
   integrity sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==
+
+axios@^0.21.4:
+  version "0.21.4"
+  resolved "https://registry.npmjs.org/axios/-/axios-0.21.4.tgz#c67b90dc0568e5c1cf2b0b858c43ba28e2eda575"
+  integrity sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==
+  dependencies:
+    follow-redirects "^1.14.0"
 
 babel-code-frame@^6.26.0:
   version "6.26.0"
@@ -3319,6 +3333,11 @@ decompress-response@^3.3.0:
   dependencies:
     mimic-response "^1.0.0"
 
+dedent@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.npmjs.org/dedent/-/dedent-0.6.0.tgz#0e6da8f0ce52838ef5cec5c8f9396b0c1b64a3cb"
+  integrity sha512-cSfRWjXJtZQeRuZGVvDrJroCR5V2UvBNUMHsPCdNYzuAG8b9V8aAy3KUcdQrGQPXs17Y+ojbPh1aOCplg9YR9g==
+
 dedent@^0.7.0:
   version "0.7.0"
   resolved "https://registry.npmjs.org/dedent/-/dedent-0.7.0.tgz#2495ddbaf6eb874abb0e1be9df22d2e5a544326c"
@@ -4200,6 +4219,11 @@ flow-parser@^0.121.0:
   version "0.121.0"
   resolved "https://registry.npmjs.org/flow-parser/-/flow-parser-0.121.0.tgz#9f9898eaec91a9f7c323e9e992d81ab5c58e618f"
   integrity sha512-1gIBiWJNR0tKUNv8gZuk7l9rVX06OuLzY9AoGio7y/JT4V1IZErEMEq2TJS+PFcw/y0RshZ1J/27VfK1UQzYVg==
+
+follow-redirects@^1.14.0:
+  version "1.15.1"
+  resolved "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.15.1.tgz#0ca6a452306c9b276e4d3127483e29575e207ad5"
+  integrity sha512-yLAMQs+k0b2m7cVxpS1VKJVvoz7SS9Td1zss3XRwXj+ZDH00RJgnuLx7E44wx02kQLrdM3aOOy+FpzS7+8OizA==
 
 for-in@^1.0.2:
   version "1.0.2"
@@ -5919,6 +5943,19 @@ loose-envify@^1.0.0, loose-envify@^1.1.0, loose-envify@^1.3.1, loose-envify@^1.4
   dependencies:
     js-tokens "^3.0.0 || ^4.0.0"
 
+lottie-ios@3.2.3:
+  version "3.2.3"
+  resolved "https://registry.npmjs.org/lottie-ios/-/lottie-ios-3.2.3.tgz#d5a029ccce611603d178ea7ba725c1446f2310b4"
+  integrity sha512-mubYMN6+1HXa8z3EJKBvNBkl4UoVM4McjESeB2PgvRMSngmJtC5yUMRdhbbrIAn5Liu3hFGao/14s5hQIgtkRQ==
+
+lottie-react-native@^5.1.3:
+  version "5.1.3"
+  resolved "https://registry.npmjs.org/lottie-react-native/-/lottie-react-native-5.1.3.tgz#6f5d0867bb762cee1dfc0613845d50c73e138ddd"
+  integrity sha512-Ho+oM+D3if85I2EBn8c17tcg7pc880Sp/DOeNW5aWiNtlCJKX/kmlhoM19NLqjzkHEm96fTkTcTy82ZwYU3Kbg==
+  dependencies:
+    invariant "^2.2.2"
+    react-native-safe-modules "^1.0.3"
+
 lowercase-keys@^1.0.0, lowercase-keys@^1.0.1:
   version "1.0.1"
   resolved "https://registry.npmjs.org/lowercase-keys/-/lowercase-keys-1.0.1.tgz#6f9e30b47084d971a7c820ff15a6c5167b74c26f"
@@ -7243,6 +7280,15 @@ react-native-date-picker@^4.2.1:
   resolved "https://registry.npmjs.org/react-native-date-picker/-/react-native-date-picker-4.2.1.tgz#36d97c56c651e5b5c848c511585b0c548f90e3b9"
   integrity sha512-buJkmVkyJIQwqeV1/1YYLVmBj9ah1L9AFJVFad20aObJuyxPSqJZClmuwDjVH1kf9jqXICDHJEH3bbagtr6Hfg==
 
+react-native-dynamically-selected-picker@^2.0.0, react-native-dynamically-selected-picker@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.npmjs.org/react-native-dynamically-selected-picker/-/react-native-dynamically-selected-picker-2.0.1.tgz#4858561dfcfd1441354a57297cdc478278326c38"
+  integrity sha512-uwQ21Mih9KClP05RXPNjKrzTfpm328NF7Hyzlh/mAkf+I16IhB0yYpXeaVokwZJP8gclzPb/VtoZAQUQ61h6Hw==
+  dependencies:
+    prop-types "^15.7.2"
+    react-native-dynamically-selected-picker "^2.0.0"
+    react-native-linear-gradient "^2.5.6"
+
 react-native-gesture-handler@^2.4.1:
   version "2.4.2"
   resolved "https://registry.npmjs.org/react-native-gesture-handler/-/react-native-gesture-handler-2.4.2.tgz#de93760b0bc251d94e8ae692f9850ec3ed2e4f27"
@@ -7258,6 +7304,11 @@ react-native-gradle-plugin@^0.0.6:
   version "0.0.6"
   resolved "https://registry.npmjs.org/react-native-gradle-plugin/-/react-native-gradle-plugin-0.0.6.tgz#b61a9234ad2f61430937911003cddd7e15c72b45"
   integrity sha512-eIlgtsmDp1jLC24dRn43hB3kEcZVqx6DUQbR0N1ABXGnMEafm9I3V3dUUeD1vh+Dy5WqijSoEwLNUPLgu5zDMg==
+
+react-native-image-base64@^0.1.4:
+  version "0.1.4"
+  resolved "https://registry.npmjs.org/react-native-image-base64/-/react-native-image-base64-0.1.4.tgz#0a4687740de9b04df63e649c5946fc646bc0f4e9"
+  integrity sha512-WLdzwHdXFRLS9VStG1CG46+t+fcInjVWxKd1+AATElBhaAS3zwDHz7mYIZS1OX4VMuNClwl5G8dowuqUJ9aMGQ==
 
 react-native-linear-gradient@^2.5.6:
   version "2.5.6"
@@ -7310,6 +7361,18 @@ react-native-safe-area-view@^0.14.8, react-native-safe-area-view@^0.14.9:
   integrity sha512-WII/ulhpVyL/qbYb7vydq7dJAfZRBcEhg4/UWt6F6nAKpLa3gAceMOxBxI914ppwSP/TdUsandFy6lkJQE0z4A==
   dependencies:
     hoist-non-react-statics "^2.3.1"
+
+react-native-safe-modules@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.npmjs.org/react-native-safe-modules/-/react-native-safe-modules-1.0.3.tgz#f5f29bb9d09d17581193843d4173ad3054f74890"
+  integrity sha512-DUxti4Z+AgJ/ZsO5U7p3uSCUBko8JT8GvFlCeOXk9bMd+4qjpoDvMYpfbixXKgL88M+HwmU/KI1YFN6gsQZyBA==
+  dependencies:
+    dedent "^0.6.0"
+
+react-native-secure-storage@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.npmjs.org/react-native-secure-storage/-/react-native-secure-storage-0.1.2.tgz#5c04b27ce1125a6fd6e24f6c55d0d47ab0672059"
+  integrity sha512-LAuOZA2ZjVCVt+mMRE0cghsn0O6egHJk4Flp3pHC/mpDFxRmuhYKrqTruNFJD6Lhf4UtDLve+TPoD1et4KusTw==
 
 react-native-splash-screen@^3.3.0:
   version "3.3.0"
