@@ -39,7 +39,7 @@ const AuthScreen: React.FC<Props> = props => {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginLeft: 30,
+      marginHorizontal:22
     },
     apptouchable: {
       padding: 8,

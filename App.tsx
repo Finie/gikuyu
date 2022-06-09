@@ -11,6 +11,7 @@ import PreferenceScreen from 'src/screens/home/PreferenceScreen';
 import BlockedContacts from 'src/screens/home/BlockedContacts';
 import PriceQuotation from 'src/screens/home/PriceQuotation';
 import Onboarding from 'src/screens/auth/Onboarding';
+import InterestsScreen from 'src/screens/auth/InterestsScreen';
 
 const App = () => {
   useEffect(() => {
@@ -18,8 +19,9 @@ const App = () => {
   }, []);
   return (
     <NavigationContainer>
+      <InterestsScreen />
       {/* <HomeNavigator /> */}
-      <AuthNavigator />
+      {/* <AuthNavigator /> */}
 
       <ModalPortal />
     </NavigationContainer>
