@@ -16,16 +16,22 @@ import useThemeStyles from 'src/hooks/useThemeStyles';
 import FloatingButton from 'src/components/FloatingButton';
 import ReadioChecked from 'src/assets/icons/radiochecked.svg'; //radioempty.svg
 import UncheckedRadio from 'src/assets/icons/radioempty.svg'; //
+import {UserProfile} from 'src/utils/shared.types';
+import Helpers from 'src/Helpers';
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().required().email().label('Email'),
 });
 
-export default function Bodytype({navigation}) {
+export default function Bodytype({navigation, route}) {
   const {colors} = useThemeStyles();
   const [ischecked, setisChecked] = useState(false);
   const [selectedIndex, setselectedIndex] = useState(3);
   const [bodyframe, setBodyframe] = useState('SLENDER');
+  const [bodyHeight, setBodyHeight] = useState('');
+  const [isheightError, setIsheightError] = useState(false);
+
+  const UserInfo: UserProfile = route.params.data;
 
   const windowWidth = Dimensions.get('window').width;
 
@@ -39,11 +45,37 @@ export default function Bodytype({navigation}) {
     {value: '5`9   (171cm)', label: '5`9    (171cm)'},
   ];
 
-  const updateSelectedItem = (index: number) => {
+  const updateSelectedItem = ({index, item}) => {
+    setBodyHeight(item.value);
+    setIsheightError(false);
     setselectedIndex(index);
   };
 
-  const handleSumbit = () => {};
+  const handleSumbit = () => {
+    if (Helpers.isEmpty(bodyHeight)) {
+      setIsheightError(true);
+      return;
+    }
+
+    setIsheightError(false);
+    const request = {
+      first_name: UserInfo.first_name,
+      email: UserInfo.email,
+      last_name: UserInfo.last_name,
+      password: UserInfo.password,
+      middle_name: UserInfo.middle_name,
+      phone: UserInfo.phone,
+      username: UserInfo.username,
+      profile: {
+        birth_date: UserInfo.profile.birth_date,
+        gender: UserInfo.profile.gender,
+        height: bodyHeight,
+        physical_frame: bodyframe,
+      },
+    };
+
+    navigation.navigate('ethnicity', {data: request});
+  };
 
   const handleSwitch = () => setisChecked(!ischecked);
 
@@ -80,7 +112,8 @@ export default function Bodytype({navigation}) {
     },
     bottomcontainer: {
       flexDirection: 'row',
-      padding: 8,
+      paddingVertical: 16,
+      paddingHorizontal: 30,
       position: 'absolute',
       bottom: 16,
       right: 4,
@@ -116,7 +149,7 @@ export default function Bodytype({navigation}) {
       alignItems: 'center',
       marginHorizontal: 30,
       overflow: 'hidden',
-      marginTop: -32,
+      marginTop: -56,
     },
     frameheader: {
       fontWeight: '600',
@@ -129,7 +162,9 @@ export default function Bodytype({navigation}) {
       borderWidth: 1,
       borderColor: colors.snow,
       borderRadius: 6,
-      marginVertical: 40,
+      marginBottom: 40,
+      marginTop: 20,
+      marginHorizontal: 20,
     },
     gender: {
       flexDirection: 'row',
@@ -147,6 +182,11 @@ export default function Bodytype({navigation}) {
     },
     genderitem: {
       marginLeft: 16,
+    },
+    heighterror: {
+      color: colors.danger,
+      marginHorizontal: 30,
+      marginVertical: 16,
     },
   });
   return (
@@ -169,9 +209,7 @@ export default function Bodytype({navigation}) {
             <View style={styles.selector}>
               <DynamicallySelectedPicker
                 items={heights}
-                onScroll={({index, item}) => {
-                  updateSelectedItem(index);
-                }}
+                onScroll={updateSelectedItem}
                 height={300}
                 width={windowWidth}
                 fontFamily={'SourceSansPro-Regular'}
@@ -179,7 +217,12 @@ export default function Bodytype({navigation}) {
               />
             </View>
 
-            <View>
+            <View style={{marginTop: -40}}>
+              {isheightError && (
+                <Text style={styles.heighterror}>
+                  Please select yout height
+                </Text>
+              )}
               <Text style={styles.frameheader}>Physical frame</Text>
 
               <View style={styles.holder}>
@@ -224,7 +267,7 @@ export default function Bodytype({navigation}) {
       </AuthScreen>
       <View style={styles.bottomcontainer}>
         <View style={styles.fabcontainer}>
-          <FloatingButton onPress={() => navigation.navigate('ethnicity')} />
+          <FloatingButton onPress={handleSumbit} />
         </View>
       </View>
     </>

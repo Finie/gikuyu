@@ -4,6 +4,8 @@
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
 #import "RNSplashScreen.h"  // here
+#import <FBSDKCoreKit/FBSDKCoreKit.h> // <- Add This Import
+#import <React/RCTLinkingManager.h> // <- Add This Import
 
 #import <React/RCTAppSetupUtils.h>
 

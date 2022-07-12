@@ -12,19 +12,51 @@ import {Picker} from '@davidgovea/react-native-wheel-datepicker';
 import Accordion from 'src/components/view/Accordion';
 import FloatingButton from 'src/components/FloatingButton';
 import authRouter from 'src/api/routers/authRouter';
+import {UserProfile} from 'src/utils/shared.types';
+import Helpers from 'src/Helpers';
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().required().email().label('Email'),
 });
 
-export default function Ethnicity({navigation}) {
+export default function Ethnicity({navigation, route}) {
   const {colors} = useThemeStyles();
   const [ischecked, setisChecked] = useState(false);
   const [selectedIndex, setselectedIndex] = useState(3);
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState([]);
+  const [tribe, setTribe] = useState('');
+  const [isError, setIsError] = useState(false);
 
-  const handleSumbit = () => {};
+  const UserInfo: UserProfile = route.params.data;
+
+  const handleSumbit = () => {
+    if (Helpers.isEmpty(tribe)) {
+      setIsError(true);
+      return;
+    }
+
+    setIsError(false);
+
+    const request = {
+      first_name: UserInfo.first_name,
+      email: UserInfo.email,
+      last_name: UserInfo.last_name,
+      password: UserInfo.password,
+      middle_name: UserInfo.middle_name,
+      phone: UserInfo.phone,
+      username: UserInfo.username,
+      profile: {
+        birth_date: UserInfo.profile.birth_date,
+        gender: UserInfo.profile.gender,
+        height: UserInfo.profile.height,
+        physical_frame: UserInfo.profile.physical_frame,
+        ethnicity: tribe,
+      },
+    };
+
+    navigation.navigate('locationTrack', {data: request});
+  };
 
   const handleSwitch = () => setisChecked(!ischecked);
 
@@ -39,13 +71,18 @@ export default function Ethnicity({navigation}) {
     }
 
     console.log('====================================');
-    console.log(response);
+    console.log(JSON.stringify(response));
     console.log('====================================');
   };
 
   useEffect(() => {
     fetchEthnicGroups();
   }, []);
+
+  const handleOnTribeSelected = (tribeName: string) => {
+    setIsError(false);
+    setTribe(tribeName);
+  };
 
   const styles = StyleSheet.create({
     container: {
@@ -65,11 +102,9 @@ export default function Ethnicity({navigation}) {
       lineHeight: 15,
     },
     bottomcontainer: {
-      //   justifyContent: 'flex-end',
-      //   alignItems: 'flex-end',
-
       flexDirection: 'row',
-      padding: 8,
+      paddingVertical: 16,
+      paddingHorizontal: 30,
     },
     emptychecjbox: {
       borderWidth: 2,
@@ -103,8 +138,12 @@ export default function Ethnicity({navigation}) {
       alignItems: 'center',
     },
     lottie: {
-      height: 200,
+      height: 60,
       width: '100%',
+    },
+    pleaseselect: {
+      color: colors.danger,
+      marginVertical: 16,
     },
   });
 
@@ -127,7 +166,7 @@ export default function Ethnicity({navigation}) {
               <LottieView
                 autoPlay={true}
                 loop={true}
-                source={require('src/assets/lottie/heart.json')}
+                source={require('src/assets/lottie/circleloadingprogressindicator.json')}
                 style={styles.lottie}
               />
 
@@ -135,15 +174,16 @@ export default function Ethnicity({navigation}) {
             </View>
           ) : (
             <View style={styles.accordion}>
-              <Accordion data={data} />
+              <Accordion data={data} onTribeSelection={handleOnTribeSelected} />
+              {isError && (
+                <Text style={styles.pleaseselect}>Please select an option</Text>
+              )}
             </View>
           )}
         </View>
         <View style={styles.bottomcontainer}>
           <View style={styles.fabcontainer}>
-            <FloatingButton
-              onPress={() => navigation.navigate('locationTrack')}
-            />
+            <FloatingButton onPress={handleSumbit} />
           </View>
         </View>
       </AppForm>

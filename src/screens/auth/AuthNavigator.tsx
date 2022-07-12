@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import BasicInfoland from './BasicInfoland';
 import BirthdateScreen from './BirthdateScreen';
@@ -18,31 +18,46 @@ import SingWelcome from './SingWelcome';
 import StartIntro from './StartIntro';
 import WelcomeScreen from './WelcomeScreen';
 import HomeNavigator from '../home/nav/HomeNavigator';
+import AuthContextProvider from 'src/context/AuthContextProvider';
+import {UserProfile} from 'src/utils/shared.types';
+import ForgotPassword from './ForgotPassword';
 
 const Stack = createStackNavigator();
 
 const AuthNavigator = () => {
+  const [accountRequest, setAccountRequest] = useState();
+
   return (
-    <Stack.Navigator screenOptions={{headerShown: false}}>
-      <Stack.Screen name="onBoarding" component={Onboarding} />
-      <Stack.Screen name={'welcomeScreen'} component={WelcomeScreen} />
-      <Stack.Screen name="signIn" component={SignIn} />
-      <Stack.Screen name="signinWelcome" component={SingWelcome} />
-      <Stack.Screen name="securityDisclaimer" component={Securitydisclaimer} />
-      <Stack.Screen name="nameScreen" component={NameScreen} />
-      <Stack.Screen name="emailScreen" component={EmailScreen} />
-      <Stack.Screen name="birthdayScreen" component={BirthdateScreen} />
-      <Stack.Screen name="basicInfoLand" component={BasicInfoland} />
-      <Stack.Screen name="genderScreen" component={GenderScreen} />
-      <Stack.Screen name="bodyTypes" component={Bodytype} />
-      <Stack.Screen name="ethnicity" component={Ethnicity} />
-      <Stack.Screen name="interestScreen" component={InterestsScreen} />
-      <Stack.Screen name="locationTrack" component={LocationTrack} />
-      <Stack.Screen name="startIntro" component={StartIntro} />
-      <Stack.Screen name="personalityPhoto" component={Personalityphotos} />
-      <Stack.Screen name="finisOnboard" component={FinishOnboard} />
-      <Stack.Screen name="mainScreen" component={HomeNavigator} />
-    </Stack.Navigator>
+    <AuthContextProvider.Provider
+      value={{
+        accountRequest,
+        setAccountRequest,
+      }}>
+      <Stack.Navigator screenOptions={{headerShown: false}}>
+        <Stack.Screen name="onBoarding" component={Onboarding} />
+        <Stack.Screen name={'welcomeScreen'} component={WelcomeScreen} />
+        <Stack.Screen name="signIn" component={SignIn} />
+        <Stack.Screen name={'forgotPassword'} component={ForgotPassword} />
+        <Stack.Screen name="signinWelcome" component={SingWelcome} />
+        <Stack.Screen
+          name="securityDisclaimer"
+          component={Securitydisclaimer}
+        />
+        <Stack.Screen name="nameScreen" component={NameScreen} />
+        <Stack.Screen name="emailScreen" component={EmailScreen} />
+        <Stack.Screen name="birthdayScreen" component={BirthdateScreen} />
+        <Stack.Screen name="basicInfoLand" component={BasicInfoland} />
+        <Stack.Screen name="genderScreen" component={GenderScreen} />
+        <Stack.Screen name="bodyTypes" component={Bodytype} />
+        <Stack.Screen name="ethnicity" component={Ethnicity} />
+        <Stack.Screen name="locationTrack" component={LocationTrack} />
+        <Stack.Screen name="startIntro" component={StartIntro} />
+        <Stack.Screen name="personalityPhoto" component={Personalityphotos} />
+        <Stack.Screen name="interestScreen" component={InterestsScreen} />
+        <Stack.Screen name="finisOnboard" component={FinishOnboard} />
+        <Stack.Screen name="mainScreen" component={HomeNavigator} />
+      </Stack.Navigator>
+    </AuthContextProvider.Provider>
   );
 };
 

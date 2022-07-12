@@ -1,5 +1,5 @@
 import {View, StyleSheet, TouchableOpacity} from 'react-native';
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import * as Yup from 'yup';
 
 import AuthScreen from 'src/components/screen/AuthScreen';
@@ -10,17 +10,37 @@ import useThemeStyles from 'src/hooks/useThemeStyles';
 import FormInput from 'src/components/forms/FormInput';
 
 import ChechBox from 'src/assets/icons/checkboxcheck.svg';
+import AuthContextProvider from 'src/context/AuthContextProvider';
+import {UserProfile} from 'src/utils/shared.types';
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().required().email().label('Email'),
+  password: Yup.string().required('Password is required'),
+  confirm: Yup.string().oneOf(
+    [Yup.ref('password'), null],
+    'Passwords do not match',
+  ),
 });
 
-export default function EmailScreen({navigation}) {
+export default function EmailScreen({navigation, route}) {
   const {colors} = useThemeStyles();
   const [ischecked, setisChecked] = useState(false);
 
-  const handleSumbit = () => {
-    navigation.navigate('birthdayScreen');
+  const {data} = route.params;
+  const Usernames: UserProfile = data;
+
+  const handleSumbit = (data: {email: string; password: string}) => {
+    const request = {
+      first_name: Usernames.first_name,
+      email: data.email,
+      password: data.password,
+      last_name: Usernames.last_name,
+      middle_name: Usernames.middle_name,
+      phone: Usernames.phone,
+      username: Usernames.username,
+    };
+
+    navigation.navigate('birthdayScreen', {data: request});
   };
 
   const handleSwitch = () => setisChecked(!ischecked);
@@ -43,11 +63,9 @@ export default function EmailScreen({navigation}) {
       lineHeight: 15,
     },
     bottomcontainer: {
-      //   justifyContent: 'flex-end',
-      //   alignItems: 'flex-end',
-
       flexDirection: 'row',
-      padding: 8,
+      paddingVertical: 16,
+      paddingHorizontal: 30,
     },
     emptychecjbox: {
       borderWidth: 2,
@@ -80,13 +98,27 @@ export default function EmailScreen({navigation}) {
       <AppForm
         initialValues={{
           email: '',
+          password: '',
+          confirm: '',
         }}
         validationSchema={validationSchema}
         onSubmit={handleSumbit}>
         <View style={styles.container}>
           <Text style={styles.howtwxt}>What’s your email?</Text>
 
-          <FormInput name={'email'} placeholder={'Email'} />
+          <FormInput
+            name={'email'}
+            placeholder={'Email'}
+            keyboardType={'email-address'}
+          />
+
+          <FormInput name={'password'} placeholder={'Password'} ispassword />
+
+          <FormInput
+            name={'confirm'}
+            placeholder={'Confirm password'}
+            ispassword
+          />
         </View>
         <View style={styles.bottomcontainer}>
           <TouchableOpacity style={styles.disclaimer} onPress={handleSwitch}>

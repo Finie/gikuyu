@@ -6,7 +6,7 @@ import Text from 'src/components/Text';
 import ArrowIcon from 'src/assets/icons/arrow.svg';
 import useThemeStyles from 'src/hooks/useThemeStyles';
 
-export default function StartIntro({navigation}) {
+export default function StartIntro({navigation, route}) {
   const {colors} = useThemeStyles();
   const styles = StyleSheet.create({
     centercontainer: {
@@ -30,7 +30,8 @@ export default function StartIntro({navigation}) {
     bottomview: {
       justifyContent: 'flex-end',
       alignItems: 'flex-end',
-      padding: 16,
+      paddingVertical: 16,
+      paddingHorizontal: 30,
     },
     first: {
       fontSize: 24,
@@ -62,7 +63,9 @@ export default function StartIntro({navigation}) {
 
       <View style={styles.bottomview}>
         <TouchableOpacity
-          onPress={() => navigation.navigate('personalityPhoto')}
+          onPress={() =>
+            navigation.navigate('personalityPhoto', {data: route.params.data})
+          }
           style={styles.bottombutton}>
           <ArrowIcon />
         </TouchableOpacity>

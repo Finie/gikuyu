@@ -1,5 +1,12 @@
 import {View, StyleSheet, TextInput, ScrollView, FlatList} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
+import {Manager} from 'socket.io-client';
+
+import moment from 'moment';
+
+import {CompatClient, Stomp} from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
+
 import ChatScreen from 'src/components/screen/ChatScreen';
 import CurrentUserFirstBubble from 'src/components/view/CurrentUserFirstBubble';
 import CurrentUserSecondBubble from 'src/components/view/CurrentUserSecondBubble';
@@ -9,69 +16,183 @@ import useThemeStyles from 'src/hooks/useThemeStyles';
 
 import SendIcon from 'src/assets/icons/sendicon.svg';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import {MessageItem, UserMatchType} from 'src/utils/shared.types';
+import Helpers from 'src/Helpers';
+import AnimatedLottieView from 'lottie-react-native';
+import Text from 'src/components/Text';
+import BaseContextProvider from 'src/context/BaseContextProvider';
+import EncryptionStore from 'src/data/EncryptionStore';
+import chatRouter from 'src/api/routers/chatRouter';
+
+// let stompClient: CompatClient | null = null;
+
+const baseUrl = 'http://165.22.28.94';
 
 export default function ChatRoom({navigation, route}) {
-  const {data} = route.params;
+  const {data, token, usename} = route.params;
+  const [bearerToken, setBearerToken] = useState(token);
+  const [userName, setUserName] = useState(usename);
+  const [isConnected, setisConnected] = useState(false);
+  const [newdata, setNewData] = useState({});
+  const {userData} = useContext(BaseContextProvider);
+
+  const updateData = useCallback(() => {
+    console.log(
+      '====================================\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n',
+    );
+    console.log(thread);
+    console.log(
+      '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n====================================',
+    );
+    setThread(thread);
+  }, []);
+
+  // const forceUpdate = updateData();
+
+  const [receiver, setReceiver] = useState('');
+
+  const userInfo: UserMatchType = data;
+
+  const header = {
+    Authorization: 'Bearer ' + bearerToken,
+    'App-ID': 1,
+  };
+
+  const stompClient = Stomp.over(() => new SockJS(baseUrl + '/chat-ws'));
+  stompClient.configure({
+    reconnectDelay: 5000,
+  });
+  stompClient.connect(header, onConnected, onError);
+
+  function onConnected(data: any) {
+    // console.log('====================================');
+    // console.log('is now connected :::::: ', data);
+    // console.log('====================================');
+
+    //Subscribe to private
+    stompClient?.subscribe('/user/' + userName + '/private', onMessageReceived);
+
+    //Subscribe to errors
+    stompClient?.subscribe('/queue/errors', onErrorReceived);
+
+    //Tell your username to the server
+    stompClient?.send(
+      '/api/message',
+      header,
+      JSON.stringify({sender: userName, type: 'JOIN'}),
+    );
+
+    setisConnected(true);
+  }
+
+  function onError(error: any) {
+    console.log('====================================');
+    console.log(error);
+    console.log(
+      'Could not connect to WebSocket server. Please refresh this page to try again!',
+    );
+    console.log('====================================');
+  }
+
+  function onErrorReceived(payload: {body: any}) {
+    console.log(payload.body);
+  }
+
+  function onMessageReceived(payload: {body: string}) {
+    console.log("We're here ::::", payload);
+
+    const message = JSON.parse(payload.body);
+    // setThread((thread: any) => [...thread, message]);
+
+    thread.push(message);
+
+    updateData();
+
+    console.log(
+      '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n===============Messages recieved=====================',
+    );
+    console.log(message);
+    console.log('====================================\n\n\n\n\n\n\n\n\n\n\n');
+  }
+
+  const sendMessage = async () => {
+    // console.log('====================================');
+    // console.log('the message');
+    // console.log(message);
+    // console.log('====================================');
+    // return;
+
+    updateData();
+
+    if (message !== '') {
+      const chatMessage = {
+        sender: userName,
+        receiver: userInfo.user.username,
+        content: message,
+        type: 'CHAT',
+        time:
+          new Date(Date.now()).getHours() +
+          ':' +
+          new Date(Date.now()).getMinutes(),
+      };
+
+      // console.log('====================================');
+      // console.log('Sending message :::: ');
+      // console.log('Header :::: ', header);
+      // console.log('message :::: ', JSON.stringify(chatMessage));
+      // console.log('====================================');
+
+      stompClient?.send(
+        '/api/private-message',
+        header,
+        JSON.stringify(chatMessage),
+      );
+
+      const messageRequest: MessageItem = {
+        content: message,
+        created_on: `${new Date(Date.now())}`,
+        id: 0,
+        sender: userName,
+      };
+
+      // thread.concat(messageRequest);
+      setThread([...thread, messageRequest]);
+      setNewData(messageRequest);
+
+      // setThread((thread: any) => [...thread, chatMessage]);
+      setMessage('');
+    }
+  };
 
   const {colors} = useThemeStyles();
 
   const [message, setMessage] = useState('');
 
-  const [thread, setThread] = useState([
-    {
-      id: 0,
-      userId: 0,
-      message: 'Hi Irene 👋',
-      time: '8.00pm',
-    },
-    {
-      id: 1,
-      userId: 0,
-      message:
-        'My name is Adam, I’m 24 years old. It looks like we have a lot of similarities to each other. Can I know you a bit more? 😁',
-      time: '8.01pm',
-    },
-    {
-      id: 2,
-      userId: 1,
-      message: 'Hi Adam ...',
-      time: '8.00pm',
-    },
-    {
-      id: 3,
-      userId: 1,
-      message:
-        'I’m Jenny, I’m 21 years old. I currently live in Los Angeles 😊',
-      time: '8.00pm',
-    },
-    {
-      id: 4,
-      userId: 0,
-      message: 'Where are you from?',
-      time: '8.00pm',
-    },
-  ]);
+  const [thread, setThread] = useState([] as any);
 
-  /**
-   * react hook
-   * @returns triggers forceupdate
-   */
+  const fetchChalog = async () => {
+    const response = await chatRouter.getIndividualMessages(
+      data.user.username,
+      1,
+      100,
+    );
 
-  //create your forceUpdate hook
-  function useForceUpdate() {
-    return () => {
-      setMessage('');
-      setThread([
-        {
-          id: thread.length + 1,
-          userId: 0,
-          message: message,
-          time: '8.00pm',
-        },
-        ...thread,
-      ]);
-    }; // update the state to force render
-  }
+    if (response.ok) {
+      // console.log('====================================');
+      // console.log(response.data.data);
+      // console.log('====================================');
+
+      setThread(response.data.data);
+    }
+
+    // console.log('====================================');
+    // console.log(response);
+    // console.log('====================================');
+  };
+
+  useEffect(() => {
+    fetchChalog();
+  }, []);
 
   const styles = StyleSheet.create({
     messagecontainer: {
@@ -115,43 +236,60 @@ export default function ChatRoom({navigation, route}) {
     setMessage(text);
   };
 
-  const forceUpdate = useForceUpdate();
+  // const forceUpdate = useForceUpdate();
 
   return (
     <ChatScreen
-      image={data.image}
+      image={data?.image || ''}
       isheaderVisible
       onBackPress={() => navigation.goBack()}
-      title={data.name}>
-      <View style={{flex: 9, paddingTop: 16}}>
-        <FlatList
-          contentContainerStyle={styles.messagecontainer}
-          data={thread}
-          inverted
-          showsVerticalScrollIndicator={false}
-          keyExtractor={item => item.id.toString()}
-          renderItem={({item}) => {
-            switch (item.userId) {
-              case 0:
+      title={`${userInfo.user.first_name} ${userInfo.user.last_name}`}>
+      {Helpers.isEmpty(thread) ? (
+        <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            flex: 1,
+          }}>
+          <AnimatedLottieView
+            autoPlay={true}
+            loop={false}
+            style={{height: 200}}
+            source={require(`src/assets/lottie/nomessage.json`)}
+          />
+
+          <Text style={{fontSize: 24, lineHeight: 32, marginTop: 16}}>
+            No previous chats
+          </Text>
+        </View>
+      ) : (
+        <View style={{flex: 9, paddingTop: 16}}>
+          <FlatList
+            contentContainerStyle={styles.messagecontainer}
+            data={thread}
+            inverted
+            showsVerticalScrollIndicator={false}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({item}) => {
+              if (item.sender === userName) {
                 return (
                   <CurrentUserFirstBubble
-                    message={item.message}
-                    time={item.time}
+                    message={item.content}
+                    time={moment(item.created_on).format('HH:MM a')}
                   />
                 );
-
-              default:
+              } else {
                 return (
                   <OtherUserFirstBubble
-                    message={item.message}
-                    time={item.time}
+                    message={item.content}
+                    time={moment(item.created_on).format('HH:MM a')}
                   />
                 );
-            }
-          }}
-        />
-        <ScrollView>{thread.map((item, index) => {})}</ScrollView>
-      </View>
+              }
+            }}
+          />
+        </View>
+      )}
 
       <View style={styles.incontainer}>
         <View style={styles.inputFieldcontainer}>
@@ -163,7 +301,7 @@ export default function ChatRoom({navigation, route}) {
             value={message}
           />
 
-          <TouchableOpacity onPress={forceUpdate} style={styles.sendButton}>
+          <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
             <SendIcon />
           </TouchableOpacity>
         </View>

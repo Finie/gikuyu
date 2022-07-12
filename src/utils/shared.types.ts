@@ -41,3 +41,61 @@ export type UserProfile = {
     };
   };
 };
+
+export type ExploreMatch = {
+  first_name: string;
+  last_name: string;
+  username: string;
+  bio: string;
+  email: string;
+  default_image: string;
+  age: string;
+  middle_name: string;
+  id: string;
+  phone: string;
+  status: string;
+};
+
+export type UserMatchType = {
+  user: {
+    id: number;
+    email: string;
+    first_name: string;
+    last_name: string;
+    middle_name: string;
+    username: string;
+    phone: string;
+    status: string;
+    age: string;
+    bio: string;
+    created_on: string;
+    last_modified_on: string;
+    default_image: string;
+  };
+};
+
+export type ConversationInfo = {
+  conversation_id: number;
+  user: {
+    age: number;
+    bio: string;
+    created_on: string;
+    email: string;
+    first_name: string;
+    id: number;
+    last_modified_on: string;
+    last_name: string;
+    middle_name: string;
+    phone: string;
+    status: string;
+    username: string;
+    default_image: string;
+  };
+};
+
+export type MessageItem = {
+  content: string;
+  created_on: string;
+  id: number;
+  sender: string;
+};

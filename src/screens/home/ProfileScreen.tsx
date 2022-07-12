@@ -5,8 +5,9 @@ import {
   SafeAreaView,
   Platform,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {Modal, ModalContent} from 'react-native-modals';
+import moment from 'moment';
 
 import Text from 'src/components/Text';
 import useThemeStyles from 'src/hooks/useThemeStyles';
@@ -32,11 +33,21 @@ import Rewind from 'src/assets/icons/modalrewind.svg';
 import Inclusive from 'src/assets/icons/inclusive.svg';
 import Schedule from 'src/assets/icons/schedule.svg'; //border.svg
 import Heart from 'src/assets/icons/border.svg'; //
+import BaseContextProvider from 'src/context/BaseContextProvider';
+import EncryptionStore from 'src/data/EncryptionStore';
+import {NavigationContainer} from '@react-navigation/native';
 
 export default function ProfileScreen({navigation}) {
   const {colors} = useThemeStyles();
 
   const [isModalVisible, setModalIsVisible] = useState(false);
+
+  const {userData, setuserData} = useContext(BaseContextProvider);
+
+  console.log('====================================');
+  console.log(JSON.stringify(userData));
+  console.log('====================================');
+
   const styles = StyleSheet.create({
     container: {
       flexGrow: 1,
@@ -216,8 +227,10 @@ export default function ProfileScreen({navigation}) {
         </View>
 
         <View style={styles.namejoincont}>
-          <Text style={styles.name}>Adam Weko</Text>
-          <Text>Joined two weeks ago</Text>
+          <Text style={styles.name}>{userData.first_name}</Text>
+          <Text>{`Joined ${moment(userData.last_modified_on).fromNow(
+            true,
+          )} ago`}</Text>
         </View>
 
         <View style={styles.descover}>
@@ -258,19 +271,21 @@ export default function ProfileScreen({navigation}) {
           <ProfButton
             title="Security"
             Icon={<Security />}
-            onClick={() => console.log()}
+            onClick={() => {
+              navigation.navigate('securityscreen');
+            }}
           />
           <ProfButton
             title="Safety & Help Center"
             Icon={<Support />}
-            onClick={() => console.log()}
+            onClick={() => navigation.navigate('safetyandhelp')}
           />
         </View>
 
         <View style={styles.bottomlayout}>
           <View style={styles.whats}>
             <Whatshot />
-            <Text style={styles.whatstext}>My Gikuyu Singles Gold</Text>
+            <Text style={styles.whatstext}>My Bantu Singles Gold</Text>
           </View>
 
           <Text style={styles.unlimited}>

@@ -1,13 +1,57 @@
-import {View, ImageBackground, StyleSheet, StatusBar} from 'react-native';
-import React from 'react';
+import {
+  View,
+  ImageBackground,
+  StyleSheet,
+  StatusBar,
+  FlatList,
+} from 'react-native';
+import React, {useEffect, useState} from 'react';
 import {ScrollView} from 'react-native-gesture-handler';
 import useThemeStyles from 'src/hooks/useThemeStyles';
 import Outline from 'src/assets/icons/loveoutline.svg';
 import Text from 'src/components/Text';
 import FloatingLabelInput from 'src/components/FloatingLabelInput';
 import MatchItem from 'src/components/view/MatchItem';
-export default function MatchesScreen() {
+import homeRouter from 'src/api/routers/homeRouter';
+import AnimatedLottieView from 'lottie-react-native';
+import Helpers from 'src/Helpers';
+import {VerticalMapList} from 'src/components/view/VerticalMapList';
+import NoDatatDisplay from 'src/components/view/NoDatatDisplay';
+
+export default function MatchesScreen({navigation}) {
   const {colors} = useThemeStyles();
+  const [isLoading, setIsloading] = useState(false);
+  const [is404Error, setis404Error] = useState('');
+
+  const [matchData, setMatchData] = useState([]);
+
+  const fetchMatches = async () => {
+    const request = {page: 1, pagesize: 10};
+    setIsloading(true);
+    const response = await homeRouter.findMyMatches(request);
+    setIsloading(false);
+
+    if (response.ok) {
+      setMatchData(response.data.data.data);
+      console.log('====================================');
+      console.log(JSON.stringify(response.data.data.data));
+      console.log('====================================');
+      return;
+    }
+
+    if (response.status === 404) {
+      setis404Error(response.data.message);
+      return;
+    }
+
+    console.log('====================================');
+    console.log(response.data);
+    console.log('====================================');
+  };
+
+  useEffect(() => {
+    fetchMatches();
+  }, []);
 
   const styles = StyleSheet.create({
     container: {
@@ -40,6 +84,7 @@ export default function MatchesScreen() {
     scrollflex: {
       flexGrow: 1,
     },
+    loaderstyle: {flex: 1, justifyContent: 'center', alignItems: 'center'},
   });
   return (
     <ScrollView
@@ -66,37 +111,53 @@ export default function MatchesScreen() {
         <FloatingLabelInput label={'Search'} search />
       </View>
 
+      {isLoading && (
+        <View style={styles.loaderstyle}>
+          <AnimatedLottieView
+            autoPlay={true}
+            loop={true}
+            style={{height: 60}}
+            source={require('src/assets/lottie/circleloadingprogressindicator.json')}
+          />
+        </View>
+      )}
+
+      {!Helpers.isEmpty(is404Error) && (
+        <NoDatatDisplay
+          mainHeader={'You don’t have any matches yet'}
+          description={
+            ' Make the first move. Swipe on profiles of people who you might match with.'
+          }
+          actiontext={'See Today’s Picks →'}
+          onPress={function (): void {
+            navigation.navigate('home');
+          }}
+        />
+      )}
+
       <View style={{marginBottom: 60}}>
-        <View style={{backgroundColor: colors.snow, height: 2}} />
-        <MatchItem isNew />
-        <View style={{backgroundColor: colors.snow, height: 2}} />
-        <MatchItem />
-        <View style={{backgroundColor: colors.snow, height: 2}} />
-        <MatchItem />
-        <View style={{backgroundColor: colors.snow, height: 2}} />
-        <MatchItem />
-        <View style={{backgroundColor: colors.snow, height: 2}} />
-        <MatchItem />
-        <View style={{backgroundColor: colors.snow, height: 2}} />
-        <MatchItem />
-        <View style={{backgroundColor: colors.snow, height: 2}} />
-        <MatchItem />
-        <View style={{backgroundColor: colors.snow, height: 2}} />
-        <MatchItem />
-        <View style={{backgroundColor: colors.snow, height: 2}} />
-        <MatchItem />
-        <View style={{backgroundColor: colors.snow, height: 2}} />
-        <MatchItem />
-        <View style={{backgroundColor: colors.snow, height: 2}} />
-        <MatchItem />
-        <View style={{backgroundColor: colors.snow, height: 2}} />
-        <MatchItem />
-        <View style={{backgroundColor: colors.snow, height: 2}} />
-        <MatchItem />
-        <View style={{backgroundColor: colors.snow, height: 2}} />
-        <MatchItem />
-        <View style={{backgroundColor: colors.snow, height: 2}} />
-        <MatchItem />
+        <VerticalMapList
+          data={matchData}
+          renderItem={({item}) => (
+            <MatchItem
+              onPress={() =>
+                navigation.navigate('messageUi', {data: item.swipe_b})
+              }
+              data={item.swipe_b}
+            />
+          )}
+          ListHeaderComponent={undefined}
+          ListHeaderComponentStyle={undefined}
+          ListFooterComponent={undefined}
+          ListFooterComponentStyle={undefined}
+          ListEmptyComponent={undefined}
+          style={undefined}
+          horizontal={undefined}
+          ItemSeparatorComponent={() => (
+            <View style={{backgroundColor: colors.snow, height: 2}} />
+          )}
+          numColumns={undefined}
+        />
       </View>
     </ScrollView>
   );

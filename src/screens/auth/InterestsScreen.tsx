@@ -6,6 +6,7 @@ import AuthScreen from 'src/components/screen/AuthScreen';
 import Text from 'src/components/Text';
 import AppForm from 'src/components/forms/AppForm';
 import useThemeStyles from 'src/hooks/useThemeStyles';
+import {Modal, ModalContent} from 'react-native-modals';
 
 import Musicnote from 'src/assets/icons/musicnote.svg'; //
 import InactiveNote from 'src/assets/icons/inactivenote.svg'; //mapinactive.svg
@@ -26,74 +27,140 @@ import FloatingLabelInput from 'src/components/FloatingLabelInput';
 import Button from 'src/components/pressable/Button';
 import PassionItem from 'src/components/PassionItem';
 import Helpers from 'src/Helpers';
+import {UserProfile} from 'src/utils/shared.types';
+import authRouter from 'src/api/routers/authRouter';
+import AnimatedLottieView from 'lottie-react-native';
+import {VerticalMapList} from 'src/components/view/VerticalMapList';
+import MorePassionItem from 'src/components/MorePassionItem';
+import DropDwon from 'src/components/DropDwon';
+import OverLayLoader from 'src/components/view/OverLayLoader';
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().required().email().label('Email'),
 });
 
-export default function InterestsScreen() {
+export default function InterestsScreen({navigation, route}) {
   const {colors} = useThemeStyles();
-  const [ischecked, setisChecked] = useState(false);
-  const [isart, setisart] = useState(false);
-  const [isfashion, setisfashion] = useState(false);
-  const [isfood, setisfood] = useState(false);
-  const [ispainting, setispainting] = useState(false);
-  const [istravel, setistravel] = useState(false);
+
+
   const [moreSelected, setmoreSelected] = useState([] as any);
+  const [dataMore, setdataMore] = useState([]);
+  const [passion, setPassion] = useState([]);
+  const [passionLoading, setPassionLoading] = useState(false);
+  const [selectedPassion, setSelectedPassion] = useState([] as any);
+  const [language, setLanguage] = useState([] as any);
+  const [selectedLanguage, setSelectedLanguage] = useState([] as any);
+  const [editaboutme, seteditaboutme] = useState('');
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
-  const data = [
-    {
-      id: 1,
-      name: 'I smoke',
-    },
-    {
-      id: 2,
-      name: 'I smoke',
-    },
-    {
-      id: 3,
-      name: 'I smoke',
-    },
-  ];
+  const [isLoading, setIsloading] = useState(false);
+  const [isOthersFetching, setisOthersFetching] = useState(false);
 
-  const handleSumbit = () => {};
+  const [selectedLookFor, setSelectedLookFor] = useState('');
 
-  const handleSwitch = () => setisChecked(!ischecked);
+  const UserInfo: UserProfile = route.params.data;
 
-  const isFirstElement = (index: number) => {
-    if (index === 0) {
-      return true;
-    }
+  const fetchPassions = async () => {
+    setPassionLoading(true);
+    const response = await authRouter.fetchPassions();
+    setPassionLoading(false);
 
-    return false;
-  };
-
-  const isLastElement = (index: number, length: number) => {
-    if (index === length) {
-      return true;
-    }
-
-    return false;
-  };
-
-  const onMoreItemsSelection = (data: {id: number; name: string}) => {
-    if (Helpers.isEmpty(moreSelected)) {
-      moreSelected.push(data);
+    if (response.ok) {
+      setPassion(response.data.data);
       return;
     }
 
-    const array = moreSelected.filter((element: {id: number; name: string}) => {
-      return element.id !== data.id;
-    });
+    console.log('====================================');
+    console.log(response);
+    console.log('====================================');
+  };
 
-    setmoreSelected(array);
+  const fetchOtherData = async () => {
+    setisOthersFetching(true);
+    const response = await authRouter.fetchOtherPersions();
+    setisOthersFetching(false);
+
+    if (response.ok) {
+      console.log('====================================');
+      console.log(JSON.stringify(response.data.data));
+      console.log('====================================');
+      setdataMore(response.data.data);
+      return;
+    }
+
+    console.log('====================================');
+    console.log(response);
+    console.log('====================================');
+  };
+
+  const fetchLanguages = async () => {
+    const response = await authRouter.fetchLanguages();
+
+    if (response.ok) {
+      setLanguage(response.data.data);
+      console.log('====================================');
+      console.log(response.data);
+      console.log('====================================');
+
+      return;
+    }
+
+    console.log('====================================');
+    console.log(response);
+    console.log('====================================');
+  };
+
+  const handleSumbit = async () => {
+    const request: UserProfile = {
+      first_name: UserInfo.first_name,
+      email: UserInfo.email,
+      last_name: UserInfo.last_name,
+      password: UserInfo.password,
+      middle_name: UserInfo.middle_name,
+      phone: UserInfo.phone,
+      username: UserInfo.username,
+      profile: {
+        birth_date: UserInfo.profile.birth_date,
+        gender: UserInfo.profile.gender,
+        height: UserInfo.profile.height,
+        physical_frame: UserInfo.profile.physical_frame,
+        ethnicity: UserInfo.profile.ethnicity,
+        location: {
+          google_place_id: 'string',
+          name: 'string',
+          longitude: UserInfo.profile.location.longitude,
+          latitude: UserInfo.profile.location.latitude,
+        },
+        // media: UserInfo.profile.media,
+        bio: {
+          bio: editaboutme,
+          looking_for: selectedLookFor,
+          language_ids: selectedLanguage,
+          passion_ids: selectedPassion,
+          other_details_ids: moreSelected,
+        },
+      },
+    };
+
+    setIsloading(true);
+    const response = await authRouter.createUser(request);
+    setIsloading(false);
+
+    if (response.ok) {
+      setIsModalVisible(true);
+      return;
+    }
+
+    console.log('================all====================');
+    console.log(response.data);
+    console.log('====================================');
   };
 
   useEffect(() => {
-    console.log('====================================');
-    console.log(JSON.stringify(moreSelected));
-    console.log('====================================');
-  }, [moreSelected.lenght]);
+    fetchLanguages();
+    fetchOtherData();
+    fetchPassions();
+  }, []);
 
   const styles = StyleSheet.create({
     container: {
@@ -113,9 +180,6 @@ export default function InterestsScreen() {
       lineHeight: 15,
     },
     bottomcontainer: {
-      //   justifyContent: 'flex-end',
-      //   alignItems: 'flex-end',
-
       flexDirection: 'row',
       padding: 8,
     },
@@ -186,8 +250,10 @@ export default function InterestsScreen() {
     },
     selectiontexttypeinactive: {marginHorizontal: 16},
     selectiontexttypeactive: {marginHorizontal: 16, color: colors.white},
-    buttoncontainer: {marginHorizontal: 30, marginBottom: 200, marginTop: 30},
-    passionholder: {},
+    buttoncontainer: {marginHorizontal: 30, marginTop: 30},
+    passionholder: {
+      marginTop: 16,
+    },
     passioniteholder: {
       marginVertical: 5,
       flexDirection: 'row',
@@ -227,8 +293,120 @@ export default function InterestsScreen() {
     },
   });
 
+  // const isSelected = (
+  //   array: {id: number; name: string}[],
+  //   index: number | any,
+  // ) => {
+  //   for (var i = 0; i < array.length; i++) {
+  //     if (array[i].id === index) {
+  //       console.log('====================================');
+  //       console.log('found');
+  //       console.log(array[i]);
+  //       console.log('====================================');
+  //       return true;
+  //     }
+  //     return false;
+  //   }
+  // };
+
+  const getIconType = (index: number) => {
+    switch (index) {
+      case 0:
+        return <Musicnote />;
+        break;
+      case 1:
+        return <Fashion />;
+        break;
+      case 2:
+        return <BirthDayCake />;
+        break;
+      case 3:
+        return <PaintPrimary />;
+        break;
+      default:
+        return <Foodiconprimaty />;
+        break;
+    }
+  };
+
+  const getInactiveIconType = (index: number) => {
+    switch (index) {
+      case 0:
+        return <InactiveNote />;
+        break;
+      case 1:
+        return <InactiveFashion />;
+        break;
+      case 2:
+        return <BirthDayCakeInactive />;
+        break;
+      case 3:
+        return <PaintInactivr />;
+        break;
+      default:
+        return <MapInactive />;
+        break;
+    }
+  };
+
+  const Lookfor = [
+    {
+      id: 0,
+      name: 'MAN',
+    },
+    {
+      id: 1,
+      name: 'WOMAN',
+    },
+    {
+      id: 2,
+      name: 'BOTH',
+    },
+  ];
+
+  const Loader = () => {
+    return (
+      <View
+        style={{
+          marginTop: 16,
+        }}>
+        <AnimatedLottieView
+          autoPlay
+          loop
+          style={{
+            height: 70,
+            marginVertical: -6,
+          }}
+          source={require('src/assets/lottie/list_loader.json')}
+        />
+        <AnimatedLottieView
+          autoPlay
+          loop
+          style={{
+            height: 70,
+            marginVertical: -6,
+          }}
+          source={require('src/assets/lottie/list_loader.json')}
+        />
+        <AnimatedLottieView
+          autoPlay
+          loop
+          style={{
+            height: 70,
+            marginVertical: -6,
+          }}
+          source={require('src/assets/lottie/list_loader.json')}
+        />
+      </View>
+    );
+  };
+
   return (
-    <AuthScreen>
+    <AuthScreen
+      onBackPressed={function (): void {
+        navigation.goBack();
+      }}>
+      <OverLayLoader isLoading={isLoading} />
       <AppForm
         initialValues={{
           email: '',
@@ -246,20 +424,28 @@ export default function InterestsScreen() {
           <View style={styles.imageholdercontainer}>
             <FloatingLabelInput
               onBlur={() => console.log('blur')}
-              onChangeText={text => console.log(text)}
+              onChangeText={text => {
+                seteditaboutme(text);
+              }}
               label="About Me"
             />
 
-            <FloatingLabelInput
-              onBlur={() => console.log('blur')}
-              onChangeText={text => console.log(text)}
-              label="I’m looking for ..."
+            <DropDwon
+              title={'I am looking for a'}
+              description={'please select one'}
+              data={Lookfor}
+              onSelect={(value: {id: number; name: string}) => {
+                setSelectedLookFor(value.name);
+              }}
             />
 
-            <FloatingLabelInput
-              onBlur={() => console.log('blur')}
-              onChangeText={text => console.log(text)}
-              label="I speak these languages"
+            <DropDwon
+              title={'I speak these languages'}
+              description={'please select one'}
+              data={language}
+              onSelect={(value: {id: number; name: string}) => {
+                selectedLanguage.push(value.id);
+              }}
             />
           </View>
 
@@ -273,81 +459,120 @@ export default function InterestsScreen() {
           </View>
 
           <View style={styles.passionholder}>
-            <Text style={styles.passionname}>Passions</Text>
-
-            <View style={styles.passioniteholder}>
-              <PassionItem
-                Icon={<Musicnote />}
-                label={'Arts & Music'}
-                Inactive={<InactiveNote />}
-              />
-              <PassionItem
-                Icon={<Fashion />}
-                label={'Fashion'}
-                Inactive={<InactiveFashion />}
-              />
-            </View>
-
-            <View style={styles.passioniteholder}>
-              <PassionItem
-                Icon={<BirthDayCake />}
-                label={'Food & Drink'}
-                Inactive={<BirthDayCakeInactive />}
-              />
-              <PassionItem
-                Icon={<PaintPrimary />}
-                label={'Painting'}
-                Inactive={<PaintInactivr />}
-              />
-            </View>
-
-            <View style={styles.passioniteholder}>
-              <PassionItem
-                Icon={<Foodiconprimaty />}
-                label={'Travel & Places'}
-                Inactive={<MapInactive />}
-              />
-            </View>
+            <VerticalMapList
+              data={passion}
+              renderItem={({item, index}) => (
+                <PassionItem
+                  Icon={getIconType(item.id)}
+                  label={item.name}
+                  Inactive={getInactiveIconType(item.id)}
+                  onItemRemoved={() => {
+                    setSelectedPassion(
+                      selectedPassion.filter((items: number) => {
+                        return items !== item.id;
+                      }),
+                    );
+                  }}
+                  onItemAdded={() => {
+                    selectedPassion.push(item.id);
+                  }}
+                />
+              )}
+              numColumns={2}
+            />
           </View>
 
           <View>
             <Text style={styles.passionname}>More</Text>
-            <>
-              {data.map((item, index) => {
-                console.log('====================================');
-                console.log(data.length);
-                console.log(index);
-                console.log('====================================');
-                return (
-                  <TouchableOpacity
-                    onPress={() => onMoreItemsSelection(item)}
-                    key={index}
-                    style={
-                      isLastElement(index, data.length - 1)
-                        ? styles.morecontainerisLast
-                        : isFirstElement(index)
-                        ? styles.morecontainerisFirst
-                        : styles.morecontainer
-                    }>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                      }}>
-                      <Checked />
-                      <Text style={styles.morename}>{item.name}</Text>
-                    </View>
-                  </TouchableOpacity>
-                );
-              })}
-            </>
+            {isOthersFetching ? (
+              <Loader />
+            ) : (
+              <>
+                {dataMore.map((item, index) => {
+                  return (
+                    <MorePassionItem
+                      index={index}
+                      lastIndex={dataMore.length - 1}
+                      item={item}
+                      onItemAdded={function (): void {
+                        moreSelected.push(item.id);
+                      }}
+                      onItemUnselected={function (): void {
+                        setmoreSelected(
+                          moreSelected.filter((items: number) => {
+                            return items !== item.id;
+                          }),
+                        );
+                      }}
+                    />
+                  );
+                })}
+              </>
+            )}
           </View>
         </View>
 
         <View style={styles.buttoncontainer}>
-          <Button>Finish</Button>
+          <Button onPress={handleSumbit}>Finish</Button>
         </View>
       </AppForm>
+      <Modal
+        visible={isModalVisible}
+        swipeThreshold={200} // default 100
+        width={300}
+        onTouchOutside={() => {
+          setIsModalVisible(false);
+          navigation.navigate('signIn');
+        }}>
+        <ModalContent style={{justifyContent: 'center', alignItems: 'center'}}>
+          <View style={{justifyContent: 'center', alignItems: 'center'}}>
+            <AnimatedLottieView
+              autoPlay={true}
+              loop={false}
+              style={{width: 100, height: 100}}
+              source={require('src/assets/lottie/successful.json')}
+            />
+
+            <Text
+              style={{
+                fontSize: 20,
+                lineHeight: 26,
+                textAlign: 'center',
+                marginTop: 16,
+                color: colors.black,
+              }}>
+              Congratulations, your account has been successfully created,
+              continue to login.
+            </Text>
+          </View>
+
+          <TouchableOpacity
+            onPress={() => {
+              setIsModalVisible(false);
+              navigation.navigate('signIn');
+            }}
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: 16,
+              borderWidth: 1,
+              padding: 8,
+              width: '50%',
+              borderRadius: 16,
+              borderColor: colors.silver,
+            }}>
+            <Text
+              style={{
+                fontSize: 18,
+                fontWeight: '700',
+                lineHeight: 26,
+                color: colors.silver,
+              }}>
+              Log in
+            </Text>
+          </TouchableOpacity>
+        </ModalContent>
+      </Modal>
     </AuthScreen>
   );
 }

@@ -14,7 +14,7 @@ import Checked from 'src/assets/icons/checkboxcheck.svg';
 import FloatingLabelInput from '../FloatingLabelInput';
 import authRouter from 'src/api/routers/authRouter';
 
-const Accordion = ({data}) => {
+const Accordion = ({data, onTribeSelection}) => {
   const {colors} = useThemeStyles();
   const [isExpanded, setisExpanded] = useState(false);
   const [ismiddleExpanded, setismiddleExpanded] = useState(false);
@@ -66,6 +66,11 @@ const Accordion = ({data}) => {
     console.log('====================================');
     console.log(response);
     console.log('====================================');
+  };
+
+  const handleSelectedTribe = (item: {id: number; name: string}) => {
+    setselectedId(item.id);
+    onTribeSelection(item.name);
   };
 
   const styles = StyleSheet.create({
@@ -169,7 +174,9 @@ const Accordion = ({data}) => {
                   <>
                     {item.name !== 'Other' ? (
                       <TouchableOpacity
-                        onPress={() => setselectedId(item.id)}
+                        onPress={() => {
+                          handleSelectedTribe(item);
+                        }}
                         style={styles.bodycontainer}>
                         {item.id === selectedId ? <Checked /> : <Unchecked />}
                         <Text style={styles.headertext}>{item.name}</Text>
@@ -178,7 +185,9 @@ const Accordion = ({data}) => {
                       <Collapse>
                         <CollapseHeader>
                           <TouchableOpacity
-                            onPress={() => setselectedId(item.id)}
+                            onPress={() => {
+                              handleSelectedTribe(item);
+                            }}
                             style={styles.bodycontainer}>
                             {item.id === selectedId ? (
                               <Checked />

@@ -174,7 +174,7 @@ export default function PreferenceScreen({navigation}) {
             <SwitchSelection title={'Push notifications'} />
           </View>
           <View style={styles.valuebottom}>
-            <SwitchSelection title={'Insider news to Team Gikuyu Singles'} />
+            <SwitchSelection title={'Insider news to Team Bantu Singles'} />
           </View>
         </View>
 
@@ -185,7 +185,7 @@ export default function PreferenceScreen({navigation}) {
             <Text style={styles.blockcontact}>Blocked contacts</Text>
             <Text style={styles.sentensetext}>
               Select people fron your contact list you don’t want to see or be
-              seen by on Gikuyu Singles.
+              seen by on Bantu Singles.
             </Text>
           </View>
           <View>

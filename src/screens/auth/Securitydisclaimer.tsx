@@ -30,7 +30,8 @@ export default function Securitydisclaimer({navigation}) {
     bottomview: {
       justifyContent: 'flex-end',
       alignItems: 'flex-end',
-      padding: 16,
+      paddingVertical: 16,
+      paddingHorizontal: 30,
     },
     first: {
       fontSize: 24,
