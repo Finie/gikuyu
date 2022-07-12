@@ -12,14 +12,16 @@ import React, {ReactNode} from 'react';
 import Logo from 'src/assets/icons/gikuyulogo.png';
 import BackButton from 'src/assets/icons/backbutton.svg';
 import useThemeStyles from 'src/hooks/useThemeStyles';
+import OverLayLoader from '../view/OverLayLoader';
 
 type Props = {
   onBackPressed: () => void;
   children: ReactNode;
+  isLoading: boolean;
 };
 
 const AuthScreen: React.FC<Props> = props => {
-  const {onBackPressed, children} = props;
+  const {onBackPressed, children, isLoading = false} = props;
 
   const {colors} = useThemeStyles();
 
@@ -33,13 +35,13 @@ const AuthScreen: React.FC<Props> = props => {
       width: 35,
       height: 35,
 
-      marginHorizontal: 8,
+      // marginHorizontal: 8,
     },
     appbar: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginHorizontal:22
+      marginHorizontal: 30,
     },
     apptouchable: {
       padding: 8,
@@ -55,6 +57,7 @@ const AuthScreen: React.FC<Props> = props => {
         backgroundColor={'transparent'}
         barStyle="dark-content"
       />
+      <OverLayLoader isLoading={isLoading} />
       <View style={styles.appbar}>
         <TouchableOpacity onPress={onBackPressed} style={styles.apptouchable}>
           <BackButton />
@@ -62,7 +65,11 @@ const AuthScreen: React.FC<Props> = props => {
 
         <Image style={styles.image} source={Logo} />
       </View>
-      <ScrollView contentContainerStyle={styles.scrol}>{children}</ScrollView>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrol}>
+        {children}
+      </ScrollView>
     </SafeAreaView>
   );
 };

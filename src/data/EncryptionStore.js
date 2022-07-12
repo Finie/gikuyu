@@ -1,54 +1,61 @@
-import SecureStorage from 'react-native-secure-storage';
+import EncryptedStorage from 'react-native-encrypted-storage';
 
-const tokenKey = 'token';
+const userTokenKey = 'bantuUsertokenKey';
 
-const userKeyStore = 'userKey';
+const userKeyStore = 'bantuUserKey';
 
-const storeToken = async data => {
+const storeBantuUser = async user => {
   try {
-    await SecureStorage.setItem(tokenKey, JSON.stringify(data));
+    await EncryptedStorage.setItem(userKeyStore, JSON.stringify(user));
   } catch (error) {
-    console.log('====================================');
-    console.log(error);
-    console.log('====================================');
+    console.log('sfgsafjdgfsagfdsgad ');
   }
 };
 
-const storeUser = async data => {
+const storeToken = async token => {
   try {
-    await SecureStorage.setItem(tokenKey, JSON.stringify(data));
+    await EncryptedStorage.setItem(userTokenKey, JSON.stringify(token));
   } catch (error) {
-    console.log('====================================');
-    console.log(error);
-    console.log('====================================');
+    console.log('sfgsafjdgfsagfdsgad ');
+  }
+};
+
+const retrieveBantuUser = async () => {
+  try {
+    const result = await EncryptedStorage.getItem(userKeyStore);
+
+    if (result !== undefined) {
+      // Congrats! You've just retrieved your first value!
+      return JSON.parse(!result ? '{}' : result);
+    }
+  } catch (error) {
+    // There was an error on the native side
   }
 };
 
 const getUserToken = async () => {
   try {
-    const result = await SecureStorage.getItem(tokenKey);
-    return JSON.parse(result);
+    const result = await EncryptedStorage.getItem(userTokenKey);
+
+    if (result !== undefined) {
+      // Congrats! You've just retrieved your first value!
+      return JSON.parse(!result ? '{}' : result);
+    }
   } catch (error) {
-    console.log('====================================');
-    console.log(error);
-    console.log('====================================');
+    // There was an error on the native side
   }
 };
 
-const getUserData = async () => {
+const destroyUser = async () => {
   try {
-    const result = await SecureStorage.getItem(userKeyStore);
-    return JSON.parse(result);
-  } catch (error) {
-    console.log('====================================');
-    console.log(error);
-    console.log('====================================');
-  }
+    await EncryptedStorage.clear();
+  } catch (error) {}
 };
 
 export default {
+  storeBantuUser,
+  retrieveBantuUser,
   storeToken,
-  storeUser,
   getUserToken,
-  getUserData,
+  destroyUser,
 };

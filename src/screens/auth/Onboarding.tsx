@@ -11,6 +11,7 @@ import {
 import React, {useState, useEffect, useRef} from 'react';
 import useThemeStyles from 'src/hooks/useThemeStyles';
 import Carousel from 'react-native-anchor-carousel';
+import Helpers from 'src/Helpers';
 
 import Logo from 'src/assets/icons/gikuyulogo.png';
 import Text from 'src/components/Text';
@@ -18,26 +19,23 @@ import Button from 'src/components/pressable/Button';
 import Slider1 from 'src/assets/images/sliderone.png'; //
 import Slider2 from 'src/assets/images/slidetwo.png';
 import Slider3 from 'src/assets/images/slidethree.png';
-import ImageWhite from 'src/assets/images/images.png';
+import ImageWhite from 'src/assets/images/images.jpg';
 
 export default function Onboarding({navigation}) {
   const {colors, text} = useThemeStyles();
-  const [renderNext, setrenderNext] = useState(0);
+  const [renderNext, setrenderNext] = useState(1);
   const [header, setHeader] = useState('Find your one person, your');
   const [description, setdescription] = useState(' perfect match');
 
   const {width: windowWidth} = Dimensions.get('window');
   var carousel = useRef(null);
 
-  console.log('====================================');
-  console.log(JSON.stringify(carousel.current));
-  console.log('====================================');
+  const date = new Date(Helpers.getTheMinimumSelectableYear());
 
-  // useEffect(() => {
-  //   if (carousel !== null) {
-  //     carousel.current.scrollToIndex(renderNextto);
-  //   }
-  // }, []);
+  console.log('====================================');
+  console.log(Helpers.getTheMinimumSelectableYear());
+  console.log(date);
+  console.log('====================================');
 
   const data = [
     {
@@ -72,7 +70,8 @@ export default function Onboarding({navigation}) {
       case 3:
         setHeader('Get chatting about things');
         setdescription('you both love');
-        setrenderNext(0);
+        setrenderNext(4);
+
         break;
 
       case 1:
@@ -88,15 +87,16 @@ export default function Onboarding({navigation}) {
         break;
 
       default:
+        navigation.navigate('welcomeScreen');
         break;
     }
-    console.log(value);
   };
 
   const onNextClick = () => {
-    if (renderNext === 4) {
-      setrenderNext(0);
-      onScrollEvent(0);
+    if (renderNext === 5) {
+      setrenderNext(1);
+      onScrollEvent(1);
+
       return;
     }
     onScrollEvent(renderNext + 1);
@@ -194,7 +194,7 @@ export default function Onboarding({navigation}) {
       </View>
 
       <View>
-        <View style={{}}>
+        <View>
           <Carousel
             ref={carousel}
             initialIndex={1}

@@ -9,6 +9,7 @@ export type ThemeColors = {
   danger: string;
   warning: string;
   background: string;
+  loaderBackground: string;
 };
 
 export type ThemeSpacing = {

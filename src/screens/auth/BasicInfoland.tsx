@@ -6,9 +6,11 @@ import Text from 'src/components/Text';
 import ArrowIcon from 'src/assets/icons/arrow.svg';
 import useThemeStyles from 'src/hooks/useThemeStyles';
 import {NavigationContainer} from '@react-navigation/native';
+import {UserProfile} from 'src/utils/shared.types';
 
-export default function BasicInfoland({navigation}) {
+export default function BasicInfoland({navigation, route}) {
   const {colors} = useThemeStyles();
+
   const styles = StyleSheet.create({
     centercontainer: {
       flex: 1,
@@ -31,7 +33,8 @@ export default function BasicInfoland({navigation}) {
     bottomview: {
       justifyContent: 'flex-end',
       alignItems: 'flex-end',
-      padding: 16,
+      paddingVertical: 16,
+      paddingHorizontal: 30,
     },
     first: {
       fontSize: 24,
@@ -62,7 +65,9 @@ export default function BasicInfoland({navigation}) {
 
       <View style={styles.bottomview}>
         <TouchableOpacity
-          onPress={() => navigation.navigate('genderScreen')}
+          onPress={() =>
+            navigation.navigate('genderScreen', {data: route.params.data})
+          }
           style={styles.bottombutton}>
           <ArrowIcon />
         </TouchableOpacity>

@@ -11,13 +11,29 @@ type Props = {
   Icon?: JSX.Element;
   label: string;
   Inactive?: JSX.Element;
+  onItemAdded: () => void;
+  onItemRemoved: () => void;
 };
 
 const PassionItem: React.FC<Props> = props => {
   const {colors} = useThemeStyles();
   const [isart, setisart] = useState(false);
 
-  const {Icon, label, Inactive} = props;
+  const {Icon, label, Inactive, onItemAdded, onItemRemoved} = props;
+
+  const onSwitchStates = () => {
+    if (isart) {
+      onItemRemoved();
+      setisart(!isart);
+      return;
+    }
+
+    onItemAdded();
+    setisart(!isart);
+  };
+
+
+  
 
   const styles = StyleSheet.create({
     selectioninactive: {
@@ -58,7 +74,7 @@ const PassionItem: React.FC<Props> = props => {
 
   return (
     <TouchableOpacity
-      onPress={() => setisart(!isart)}
+      onPress={onSwitchStates}
       style={isart ? styles.selectionactive : styles.selectioninactive}>
       {Icon && (isart ? Inactive : Icon)}
       <Text

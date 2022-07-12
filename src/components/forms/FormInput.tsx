@@ -11,7 +11,7 @@ type Props = {
 };
 
 const FormInput: React.FC<Props> = props => {
-  const {name, placeholder, ispassword} = props;
+  const {name, placeholder, ispassword, ...otherProps} = props;
   const {setFieldTouched, touched, handleChange, errors} = useFormikContext();
   return (
     <>
@@ -20,6 +20,7 @@ const FormInput: React.FC<Props> = props => {
         onChangeText={handleChange(name)}
         label={placeholder}
         icon={ispassword}
+        {...otherProps}
       />
 
       <TextInputError error={errors[name]} visible={touched[name]} />

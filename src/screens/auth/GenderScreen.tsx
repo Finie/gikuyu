@@ -11,17 +11,36 @@ import FormInput from 'src/components/forms/FormInput';
 import ReadioChecked from 'src/assets/icons/radiochecked.svg'; //radioempty.svg
 import UncheckedRadio from 'src/assets/icons/radioempty.svg'; //
 import FloatingButton from 'src/components/FloatingButton';
+import {UserProfile} from 'src/utils/shared.types';
 
 const validationSchema = Yup.object().shape({
   firstName: Yup.string().required().label('First name'),
   lastName: Yup.string().required().label('Last name'),
 });
 
-export default function GenderScreen({navigation}) {
+export default function GenderScreen({navigation, route}) {
   const {colors} = useThemeStyles();
   const [gender, setgender] = useState('Male');
 
-  const handleSumbit = () => {};
+  const UserInfo: UserProfile = route.params.data;
+
+  const handleSumbit = () => {
+    const request = {
+      first_name: UserInfo.first_name,
+      email: UserInfo.email,
+      last_name: UserInfo.last_name,
+      password: UserInfo.password,
+      middle_name: UserInfo.middle_name,
+      phone: UserInfo.phone,
+      username: UserInfo.username,
+      profile: {
+        birth_date: UserInfo.profile.birth_date,
+        gender: gender.toUpperCase(),
+      },
+    };
+
+    navigation.navigate('bodyTypes', {data: request});
+  };
 
   const handleMale = () => setgender('Male');
 
@@ -47,7 +66,8 @@ export default function GenderScreen({navigation}) {
     bottomcontainer: {
       justifyContent: 'flex-end',
       alignItems: 'flex-end',
-      padding: 8,
+      paddingVertical: 16,
+      paddingHorizontal: 30,
     },
     holder: {
       borderWidth: 1,
@@ -102,7 +122,7 @@ export default function GenderScreen({navigation}) {
           </View>
         </View>
         <View style={styles.bottomcontainer}>
-          <FloatingButton onPress={() => navigation.navigate('bodyTypes')} />
+          <FloatingButton onPress={handleSumbit} />
         </View>
       </AppForm>
     </AuthScreen>

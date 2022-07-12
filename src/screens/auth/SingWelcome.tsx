@@ -1,4 +1,4 @@
-import {View, StyleSheet, Image} from 'react-native';
+import {View, StyleSheet, Image, TextInputBase} from 'react-native';
 import React from 'react';
 import AuthScreen from 'src/components/screen/AuthScreen';
 import ImageLogo from 'src/assets/images/signupwelcom.png';
@@ -6,6 +6,7 @@ import Text from 'src/components/Text';
 import Button from 'src/components/pressable/Button';
 import useThemeStyles from 'src/hooks/useThemeStyles';
 import Link from 'src/components/Link';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 
 export default function SingWelcome({navigation}) {
   const {colors} = useThemeStyles();
@@ -55,21 +56,19 @@ export default function SingWelcome({navigation}) {
         <Image style={styles.image} source={ImageLogo} />
       </View>
       <View style={styles.lowerdesign}>
-        <Text style={styles.welcomeText}>Welcome to Gikuyu Singles!</Text>
+        <Text style={styles.welcomeText}>Welcome to Bantu Singles!</Text>
 
         <Button onPress={() => navigation.navigate('securityDisclaimer')}>
           Create Account
         </Button>
 
         <View style={styles.signin}>
-          <Text style={styles.account}>
-            Already have an account?
-            <Link
-              style={styles.link}
-              onPress={() => navigation.navigate('signIn')}
-              title={' Sign in →'}
-            />
-          </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('signIn')}>
+            <Text style={styles.account}>
+              Already have an account?
+              <Text style={styles.link}>{' Sign in →'}</Text>
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
     </AuthScreen>

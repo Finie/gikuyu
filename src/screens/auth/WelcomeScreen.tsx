@@ -8,8 +8,12 @@ import {
   TouchableOpacity,
   Platform,
   Linking,
+  Alert,
 } from 'react-native';
-import React from 'react';
+import React, {useRef} from 'react';
+// import {LoginButton, ShareDialog} from 'react-native-fbsdk';
+
+// import {LoginButton, AccessToken} from 'react-native-fbsdk-next';
 
 import useThemeStyles from 'src/hooks/useThemeStyles';
 import WelcomeLogo from 'src/assets/images/welcomelogo.png'; //welcomeimage.png
@@ -22,9 +26,34 @@ import Link from 'src/components/Link';
 export default function WelcomeScreen({navigation}) {
   const {colors} = useThemeStyles();
 
+  const SHARE_LINK_CONTENT = {
+    contentType: 'link',
+    contentUrl: 'https://www.facebook.com/',
+  };
+
+  // const _shareLinkWithShareDialog = async () => {
+  //   const canShow = await ShareDialog.canShow(SHARE_LINK_CONTENT);
+  //   if (canShow) {
+  //     try {
+  //       const {isCancelled, postId} = await ShareDialog.show(
+  //         SHARE_LINK_CONTENT,
+  //       );
+  //       if (isCancelled) {
+  //         Alert.alert('Share cancelled');
+  //       } else {
+  //         Alert.alert('Share success with postId: ' + postId);
+  //       }
+  //     } catch (error) {
+  //       Alert.alert('Share fail with error: ' + error);
+  //     }
+  //   }
+  // };
+
   const openLink = () => {
     Linking.openURL('https://google.com');
   };
+
+  const fbLogin = useRef(null);
 
   const styles = StyleSheet.create({
     container: {
@@ -128,6 +157,31 @@ export default function WelcomeScreen({navigation}) {
             <Button onPress={() => navigation.navigate('signinWelcome')}>
               Create Account
             </Button>
+
+            {/* <LoginButton
+              onLoginFinished={(error: any, data: any) => {
+                console.log('====================================');
+                console.log('is Error: ', error);
+                console.log('is data ', data);
+                console.log('====================================');
+                Alert.alert(JSON.stringify(error || data, null, 2));
+              }}
+            /> */}
+
+            {/* <LoginButton
+              onLoginFinished={(error, result) => {
+                if (error) {
+                  console.log('login has error: ' + result.error);
+                } else if (result.isCancelled) {
+                  console.log('login is cancelled.');
+                } else {
+                  AccessToken.getCurrentAccessToken().then(data => {
+                    console.log(data.accessToken.toString());
+                  });
+                }
+              }}
+              onLogoutFinished={() => console.log('logout.')}
+            /> */}
 
             <TouchableOpacity style={styles.facebook}>
               <Facebook />

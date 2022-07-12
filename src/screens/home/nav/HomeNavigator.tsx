@@ -7,6 +7,8 @@ import AboutScreen from '../AboutScreen';
 import PreferenceScreen from '../PreferenceScreen';
 import PriceQuotation from '../PriceQuotation';
 import BlockedContacts from '../BlockedContacts';
+import SafetyHelpCenter from '../SafetyHelpCenter';
+import SecurityScreen from '../SecurityScreen';
 
 const Stack = createStackNavigator();
 
@@ -20,6 +22,8 @@ const HomeNavigator = () => {
       <Stack.Screen name="preference" component={PreferenceScreen} />
       <Stack.Screen name="pricestack" component={PriceQuotation} />
       <Stack.Screen name="blockedContacts" component={BlockedContacts} />
+      <Stack.Screen name="safetyandhelp" component={SafetyHelpCenter} />
+      <Stack.Screen name={'securityscreen'} component={SecurityScreen} />
     </Stack.Navigator>
   );
 };

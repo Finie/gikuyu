@@ -6,14 +6,21 @@ import Text from '../Text';
 import MessageOutline from 'src/assets/icons/messageoutline.svg';
 import StarOutline from 'src/assets/icons/startoutline.svg';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import {UserMatchType} from 'src/utils/shared.types';
+import Helpers from 'src/Helpers';
 
 type Props = {
   isNew?: boolean;
+  data: any;
+  onPress: () => void;
 };
+
 const MatchItem: React.FC<Props> = props => {
   const {colors} = useThemeStyles();
 
-  const {isNew} = props;
+  const {isNew, data, onPress} = props;
+
+  const user: UserMatchType = data;
 
   const styles = StyleSheet.create({
     image: {width: 56, height: 56, borderRadius: 28},
@@ -57,16 +64,41 @@ const MatchItem: React.FC<Props> = props => {
     },
   });
   return (
-    <View style={styles.container}>
+    <TouchableOpacity onPress={onPress} style={styles.container}>
       <View>
-        <Image
-          style={styles.image}
-          source={require('../../assets/images/sliderone.png')}
-        />
+        {Helpers.isEmpty(user.user.default_image) ? (
+          <View
+            style={{
+              backgroundColor: colors.snow,
+              width: 56,
+              height: 56,
+              borderRadius: 28,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Text
+              style={{
+                fontSize: 25,
+                fontWeight: '600',
+                color: colors.primary,
+                lineHeight: 30,
+              }}>
+              {Helpers.getAccroNames(data.user.first_name, data.user.last_name)}
+            </Text>
+          </View>
+        ) : (
+          <Image
+            style={styles.image}
+            source={require('../../assets/images/sliderone.png')}
+          />
+        )}
       </View>
 
       <View style={styles.centercontainer}>
-        <Text style={styles.nameitem}>Irene Wambui</Text>
+        <Text
+          style={
+            styles.nameitem
+          }>{`${user.user.first_name}  ${user.user.last_name}`}</Text>
 
         {isNew && (
           <View style={styles.newcontainer}>
@@ -80,11 +112,11 @@ const MatchItem: React.FC<Props> = props => {
           <StarOutline />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.touchable}>
+        <TouchableOpacity onPress={onPress} style={styles.touchable}>
           <MessageOutline />
         </TouchableOpacity>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

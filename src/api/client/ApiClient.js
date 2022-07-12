@@ -1,23 +1,24 @@
 import {create} from 'apisauce';
 import EncryptionStore from 'src/data/EncryptionStore';
+import Helpers from 'src/Helpers';
 
 const apiClient = create({
-  baseURL: 'http://165.22.28.94',
-  timeout: 30000,
+  baseURL: 'http://165.22.28.94/',
+  // timeout: 30000,
   // timeoutErrorMessage: 'Sorry server took too long to respond',
 });
 
-apiClient.addAsyncRequestTransform(async () => {
+apiClient.addAsyncRequestTransform(async request => {
   const token = await EncryptionStore.getUserToken();
 
-  if (!token) return null;
+  if (Helpers.isEmpty(token)) return null;
 
-  const token2 = token.replace(/^"(.*)"$/, '$1');
+  const token2 = token;
 
-  // request.headers["Accept"] = "application/json";
-  request.headers['Authorization'] = token2;
-  // request.headers["Authorization"] = "Authorization " + token2;
-}); //adding headers
+  request.headers['Accept'] = 'application/json';
+  request.headers['App-ID'] = '1';
+  request.headers['Authorization'] = 'Bearer ' + token2;
+}); //adding headersgikuyu
 
 const get = apiClient.get;
 

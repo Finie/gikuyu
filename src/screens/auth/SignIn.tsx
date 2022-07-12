@@ -1,6 +1,8 @@
 import {View, StyleSheet, TouchableOpacity} from 'react-native';
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import * as Yup from 'yup';
+import Toast from 'react-native-toast-message';
+
 import AuthScreen from 'src/components/screen/AuthScreen';
 import Text from 'src/components/Text';
 import useThemeStyles from 'src/hooks/useThemeStyles';
@@ -9,9 +11,13 @@ import FormInput from 'src/components/forms/FormInput';
 import SubmitForm from 'src/components/forms/SubmitForm';
 import ChechBox from 'src/assets/icons/checkboxcheck.svg';
 import Link from 'src/components/Link';
+import authRouter from 'src/api/routers/authRouter';
+import OverLayLoader from 'src/components/view/OverLayLoader';
+import EncryptionStore from 'src/data/EncryptionStore';
+import BaseContextProvider from 'src/context/BaseContextProvider';
 
 const validationSchema = Yup.object().shape({
-  email: Yup.string().required().email().trim().label('Email'),
+  username: Yup.string().required().trim().label('Username'),
   password: Yup.string().required().label('Password'),
 });
 
@@ -20,10 +26,33 @@ export default function SignIn({navigation}) {
 
   const [rememberMe, setrememberMe] = useState(true);
 
+  const [isLoading, setIsloading] = useState(false);
+
+  const {setuserData} = useContext(BaseContextProvider);
+
   const handleRemember = () => setrememberMe(!rememberMe);
 
-  const handleSubmission = data => {
-    navigation.navigate('mainScreen');
+  const handleSubmission = async (data: {
+    username: string;
+    password: string;
+  }) => {
+    setIsloading(true);
+    const response = await authRouter.loginUser(data);
+    setIsloading(false);
+
+    if (response.ok) {
+      EncryptionStore.storeToken(response.data.data.token);
+      EncryptionStore.storeBantuUser(response.data.data);
+      setuserData(response.data.data);
+      return;
+    }
+
+    Toast.show({
+      type: 'error',
+      text1: 'Request failed',
+      text2: response.data.message,
+      position: 'bottom',
+    });
   };
 
   const styles = StyleSheet.create({
@@ -73,7 +102,7 @@ export default function SignIn({navigation}) {
       fontWeight: '700',
       fontSize: 14,
       lineHeight: 17.01,
-      marginTop: 1,
+      marginTop: 2,
     },
   });
   return (
@@ -86,16 +115,17 @@ export default function SignIn({navigation}) {
           {'Let’s Sign You In'}
         </Text>
       </View>
+      <OverLayLoader isLoading={isLoading} />
       <View style={styles.main}>
         <AppForm
           initialValues={{
-            email: '',
+            username: '',
             password: '',
           }}
           onSubmit={handleSubmission}
           validationSchema={validationSchema}>
-          <FormInput name={'email'} placeholder={'Email*'} />
-          <FormInput name={'password'} placeholder={'Password*'} ispassword />
+          <FormInput name={'username'} placeholder={'Username or email *'} />
+          <FormInput name={'password'} placeholder={'Password *'} ispassword />
 
           <View style={styles.bottomlayout}>
             <TouchableOpacity
@@ -111,7 +141,10 @@ export default function SignIn({navigation}) {
             <SubmitForm title="Sign in" />
 
             <View style={styles.bottomlay}>
-              <Text style={styles.fogot}>Forgot Password</Text>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('forgotPassword')}>
+                <Text style={styles.fogot}>Forgot Password</Text>
+              </TouchableOpacity>
               <Text style={styles.donthav}>
                 Don't have an account?{' '}
                 <Link

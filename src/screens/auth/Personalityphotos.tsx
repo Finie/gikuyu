@@ -1,6 +1,14 @@
-import {View, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  ImageBackground,
+} from 'react-native';
 import React, {useState} from 'react';
 import * as Yup from 'yup';
+import {launchImageLibrary} from 'react-native-image-picker';
+import mime from 'mime';
 
 import AuthScreen from 'src/components/screen/AuthScreen';
 import Text from 'src/components/Text';
@@ -10,21 +18,139 @@ import useThemeStyles from 'src/hooks/useThemeStyles';
 
 import CameraActive from 'src/assets/icons/cameraactive.svg';
 import CameraInActive from 'src/assets/icons/imageactive.svg';
-import InactiveImage from 'src/assets/icons/inactiveImage.svg'; //inactiveRecord.svg
+import InactiveImage from 'src/assets/icons/inactiveImage.svg'; //closeimageselected.svg
+import CloseSelected from 'src/assets/icons/closeimageselected.svg'; //
 import InactiveRecord from 'src/assets/icons/inactiveRecord.svg'; //
 import FloatingButton from 'src/components/FloatingButton';
+import Helpers from 'src/Helpers';
+import {UserProfile} from 'src/utils/shared.types';
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().required().email().label('Email'),
 });
 
-export default function Personalityphotos({navigation}) {
+export default function Personalityphotos({navigation, route}) {
   const {colors} = useThemeStyles();
   const [ischecked, setisChecked] = useState(false);
+  const [image1uri, setImage1uri] = useState('' as string | undefined | null);
+  const [image2uri, setImage2uri] = useState('' as string | undefined | null);
+  const [image3uri, setImage3uri] = useState('' as string | undefined | null);
+  const [imageArray, setImageArray] = useState([] as any);
 
-  const handleSumbit = () => {};
+  const UserInfo: UserProfile = route.params.data;
 
-  const handleSwitch = () => setisChecked(!ischecked);
+  const handleSumbit = () => {
+    const request = {
+      first_name: UserInfo.first_name,
+      email: UserInfo.email,
+      last_name: UserInfo.last_name,
+      password: UserInfo.password,
+      middle_name: UserInfo.middle_name,
+      phone: UserInfo.phone,
+      username: UserInfo.username,
+      profile: {
+        birth_date: UserInfo.profile.birth_date,
+        gender: UserInfo.profile.gender,
+        height: UserInfo.profile.height,
+        physical_frame: UserInfo.profile.physical_frame,
+        ethnicity: UserInfo.profile.ethnicity,
+        location: {
+          google_place_id: 'string',
+          name: 'string',
+          longitude: UserInfo.profile.location.longitude,
+          latitude: UserInfo.profile.location.latitude,
+        },
+        media: imageArray,
+      },
+    };
+
+    navigation.navigate('interestScreen', {data: request});
+  };
+
+  const pickImageFromGalary = async () => {
+    try {
+      const result = await launchImageLibrary({
+        mediaType: 'photo',
+        includeBase64: true,
+      });
+      const response = {
+        status: 'success',
+        base64: result.assets[0].base64,
+        uri: result.assets[0].uri,
+      };
+
+      return response;
+    } catch (error) {
+      const response = {
+        status: 'error',
+        base64: null,
+        uri: null,
+        error: error,
+      };
+
+      return response;
+    }
+  };
+
+  const handleGetImage = async (currentImage: number) => {
+    switch (currentImage) {
+      case 0:
+        const {status, uri, base64} = await pickImageFromGalary();
+        if (status === 'success') {
+          setImage1uri(uri);
+          const imageRequest = {
+            encoded_file: `data:${mime.getType(
+              uri?.split('/').pop() || 'image/png',
+            )};base64,${base64}`,
+            name: uri?.split('/').pop() || 'photo',
+            type: 'PHOTO',
+            is_default: true,
+          };
+          setImageArray([...imageArray, imageRequest]);
+        }
+        break;
+      case 1:
+        const {
+          status: status1,
+          uri: uri1,
+          base64: base641,
+        } = await pickImageFromGalary();
+        if (status1 === 'success') {
+          setImage2uri(uri1);
+          const imageRequest = {
+            encoded_file: `data:${mime.getType(
+              uri?.split('/').pop() || 'image/png',
+            )};base64,${base641}`,
+            name: uri1?.split('/').pop() || 'photo',
+            type: 'PHOTO',
+            is_default: false,
+          };
+          setImageArray([...imageArray, imageRequest]);
+        }
+        break;
+      case 2:
+        const {
+          status: status2,
+          uri: uri2,
+          base64: base642,
+        } = await pickImageFromGalary();
+        if (status2 === 'success') {
+          setImage3uri(uri2);
+          const imageRequest = {
+            encoded_file: `data:${mime.getType(
+              uri?.split('/').pop() || 'image/png',
+            )};base64,${base642}`,
+            name: uri?.split('/').pop() || 'photo',
+            type: 'PHOTO',
+            is_default: false,
+          };
+          setImageArray([...imageArray, imageRequest]);
+        }
+        break;
+    }
+
+    setisChecked(!ischecked);
+  };
 
   const styles = StyleSheet.create({
     container: {
@@ -44,11 +170,9 @@ export default function Personalityphotos({navigation}) {
       lineHeight: 15,
     },
     bottomcontainer: {
-      //   justifyContent: 'flex-end',
-      //   alignItems: 'flex-end',
-
       flexDirection: 'row',
-      padding: 8,
+      paddingVertical: 16,
+      paddingHorizontal: 30,
     },
     emptychecjbox: {
       borderWidth: 2,
@@ -87,6 +211,15 @@ export default function Personalityphotos({navigation}) {
       borderRadius: 10,
       justifyContent: 'center',
       alignItems: 'center',
+      overflow: 'hidden',
+    },
+    viewimageholders: {
+      height: 142,
+      flex: 1,
+      backgroundColor: colors.snow,
+      margin: 3,
+      borderRadius: 10,
+      overflow: 'hidden',
     },
     imageholdercontainer: {
       // height: 200,
@@ -114,25 +247,68 @@ export default function Personalityphotos({navigation}) {
           </Text>
 
           <View style={styles.imageholdercontainer}>
-            <TouchableOpacity style={styles.imageholders}>
-              <CameraActive />
+            <TouchableOpacity
+              onPress={() => handleGetImage(0)}
+              style={styles.imageholders}>
+              {Helpers.isEmpty(image1uri) ? (
+                <CameraActive />
+              ) : (
+                <ImageBackground
+                  style={{height: 142, width: '100%', alignItems: 'flex-end'}}
+                  source={{uri: image1uri}}>
+                  <TouchableOpacity onPress={() => handleGetImage(0)}>
+                    <CloseSelected />
+                  </TouchableOpacity>
+                </ImageBackground>
+              )}
             </TouchableOpacity>
-            <TouchableOpacity style={styles.imageholders}>
-              <CameraInActive />
+
+            <TouchableOpacity
+              onPress={() => handleGetImage(1)}
+              style={styles.imageholders}>
+              {Helpers.isEmpty(image2uri) ? (
+                <CameraActive />
+              ) : (
+                <ImageBackground
+                  style={{height: 142, width: '100%', alignItems: 'flex-end'}}
+                  source={{uri: image2uri}}>
+                  <TouchableOpacity onPress={() => handleGetImage(1)}>
+                    <CloseSelected />
+                  </TouchableOpacity>
+                </ImageBackground>
+              )}
             </TouchableOpacity>
-            <TouchableOpacity style={styles.imageholders}>
-              <CameraInActive />
+            <TouchableOpacity
+              onPress={() => handleGetImage(2)}
+              style={styles.imageholders}>
+              {Helpers.isEmpty(image3uri) ? (
+                <CameraActive />
+              ) : (
+                <ImageBackground
+                  style={{height: 142, width: '100%', alignItems: 'flex-end'}}
+                  source={{uri: image3uri}}>
+                  <TouchableOpacity onPress={() => handleGetImage(2)}>
+                    <CloseSelected />
+                  </TouchableOpacity>
+                </ImageBackground>
+              )}
             </TouchableOpacity>
           </View>
 
           <View style={styles.imageholdercontainer}>
-            <TouchableOpacity style={styles.imageholders}>
+            <TouchableOpacity
+              onPress={() => handleGetImage(3)}
+              style={styles.imageholders}>
               <InactiveImage />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.imageholders}>
+            <TouchableOpacity
+              onPress={() => handleGetImage(4)}
+              style={styles.imageholders}>
               <InactiveRecord />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.imageholders}>
+            <TouchableOpacity
+              onPress={() => handleGetImage(5)}
+              style={styles.imageholders}>
               <InactiveRecord />
             </TouchableOpacity>
           </View>
@@ -146,9 +322,7 @@ export default function Personalityphotos({navigation}) {
           </View>
 
           <View style={styles.fabcontainer}>
-            <FloatingButton
-              onPress={() => navigation.navigate('finisOnboard')}
-            />
+            <FloatingButton onPress={handleSumbit} />
           </View>
         </View>
       </AppForm>

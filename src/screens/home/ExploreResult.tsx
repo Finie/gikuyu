@@ -251,7 +251,9 @@ export default function ExploreResult({navigation, route}) {
     <Screen
       isheaderVisible
       title={!isSearch ? '' : 'People who fit your search'}
-      onBackPress={() => navigation.goBack()}>
+      onBackPress={() => navigation.goBack()}
+      
+      >
       {!isSearch ? (
         <View style={styles.peoplecontainer}>
           <Text style={styles.peopletext}>People who love</Text>

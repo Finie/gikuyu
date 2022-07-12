@@ -21,6 +21,7 @@ const lightTheme: ThemeStyles = {
     danger: '#FF4949',
     warning: '#FFC82C',
     background: '#E5E5E5',
+    loaderBackground: 'rgba(255, 255, 255,0.8)',
   },
   spacing: {
     horizontal: 30,

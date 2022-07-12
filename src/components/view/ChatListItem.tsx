@@ -7,15 +7,12 @@ import Text from '../Text';
 import Irene from 'src/assets/images/sliderone.png';
 import LeftSwipeIcon from 'src/assets/icons/leftswipeicon.svg';
 import RightSwipable from 'src/assets/icons/rightswipable.svg';
+import {ConversationInfo} from 'src/utils/shared.types';
+import moment from 'moment';
+import Helpers from 'src/Helpers';
 
 type Props = {
-  data: {
-    id: number;
-    name: String;
-    image: URL;
-    unread?: number;
-    text?: string;
-  };
+  data: ConversationInfo;
 
   index: number;
   onClick: () => void;
@@ -128,14 +125,42 @@ const ChatListItem: React.FC<Props> = ({data, index, onClick}) => {
       ref={ref => (row[index] = ref)}>
       <TouchableOpacity style={styles.touchableOpacity} onPress={onClick}>
         <View style={styles.imageContainer}>
-          <Image style={styles.image} source={data.image} />
+          {!Helpers.isEmpty(data.user?.default_image) ? (
+            <Image
+              style={styles.image}
+              source={{uri: data.user?.default_image}}
+            />
+          ) : (
+            <View
+              style={{
+                backgroundColor: colors.snow,
+                width: 56,
+                height: 56,
+                borderRadius: 28,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Text
+                style={{
+                  fontSize: 25,
+                  fontWeight: '600',
+                  color: colors.primary,
+                  lineHeight: 30,
+                }}>
+                {Helpers.getAccroNames(
+                  data.user.first_name,
+                  data.user.last_name,
+                )}
+              </Text>
+            </View>
+          )}
         </View>
         <View style={styles.centercontainer}>
           <Text numberOfLines={1} style={styles.name}>
-            {data.name}
+            {`${data.user.first_name} ${data.user.last_name}`}
           </Text>
           <Text numberOfLines={1} style={styles.message}>
-            {data.text}
+            {data.user.username}
           </Text>
         </View>
         <View style={styles.endcontainer}>
@@ -143,13 +168,13 @@ const ChatListItem: React.FC<Props> = ({data, index, onClick}) => {
             {data.unread > 0 && (
               <View style={styles.numberholder}>
                 <Text numberOfLines={1} style={styles.numberofunred}>
-                  {data.unread}
+                  {data.user.bio}
                 </Text>
               </View>
             )}
 
             <Text numberOfLines={1} style={styles.time}>
-              11:30am
+              {moment(data.user.last_modified_on).format('HH:mm')}
             </Text>
           </View>
         </View>

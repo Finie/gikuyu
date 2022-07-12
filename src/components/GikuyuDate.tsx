@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import DatePicker from 'react-native-date-picker';
+import Helpers from 'src/Helpers';
 
 type Props = {
   onDateChange: (date: Date) => void;
@@ -19,6 +20,7 @@ const GikuyuDate: React.FC<Props> = props => {
       mode={'date'}
       date={date}
       onDateChange={handleSelected}
+      maximumDate={new Date(Helpers.getTheMinimumSelectableYear())}
     />
   );
 };
